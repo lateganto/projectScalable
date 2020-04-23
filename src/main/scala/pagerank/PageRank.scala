@@ -10,13 +10,10 @@ object PageRank {
 
       var iteration = 0
       var updatedVertices: RichVertexPairRDD = graph.vertices
-      var danglesum = 0.0
-      var incomingWeightedSum: RDD[(Id, Double)] = null
-
       while (iteration < n_iter) {
 
          //sum of the PR_values of dangling nodes
-         danglesum = damping_factor * updatedVertices
+         val danglesum = damping_factor * updatedVertices
             .map(v =>
                if (v._2.isDangling) v._2.value
                else 0.0
@@ -28,7 +25,7 @@ object PageRank {
          /* Compute the incoming contributions for each vertex.
             (Every node sends to the adjacent nodes a contribution proportional to the
             strength of the tie tha connects them)*/
-         incomingWeightedSum = graph.edges
+         val incomingWeightedSum = graph.edges
             .join(updatedVertices)
             .map { case (_, (edge, vertexData)) =>
                (edge.dstId, vertexData.value * edge.weight)
@@ -65,7 +62,7 @@ object PageRank {
                   damping_factor * rankUpdate.getOrElse(0.0) +
                   (1 - damping_factor) / numVertices
 
-               (id, vertex_data.withNewValue(newValue))
+               (id, vertex_data.setNewValue(newValue))
          }
    }
 

@@ -73,7 +73,7 @@ object GraphBuilder {
          .join(dangles)
          .map {
             case (id, (value, isDangling)) =>
-               (id, VertexData(value, isDangling))
+               (id, DataVertex(value, isDangling))
          }
          .persist()
 

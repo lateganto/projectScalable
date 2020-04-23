@@ -7,7 +7,7 @@ package object pagerank {
 
    type OutEdgePair = (Id, OutEdge)
    type VertexPair = (Id, Value)
-   type RichVertexPair = (Id, VertexData)
+   type RichVertexPair = (Id, DataVertex)
 
    type OutEdgePairRDD = RDD[OutEdgePair]
    type RichVertexPairRDD = RDD[RichVertexPair]
@@ -24,12 +24,12 @@ package object pagerank {
 
    final case class OutEdge(dstId: Id, weight: Value)
 
-   final case class VertexData(value: Value, isDangling: Boolean) {
+   final case class DataVertex(value: Value, isDangling: Boolean) {
       /**
        * Copies the vertex properties but provides a new value.
        */
-      def withNewValue(newValue: Value): VertexData =
-         VertexData(newValue, isDangling)
+      def setNewValue(newValue: Value): DataVertex =
+         DataVertex(newValue, isDangling)
    }
 
 }
