@@ -1,0 +1,71 @@
+<html lang="en">
+<head>
+    <title>Bike Stations PageRank Map</title>
+    <meta charset='utf-8'/>
+    <meta content='initial-scale=1,maximum-scale=1,user-scalable=no' name='viewport'/>
+
+    <link href='./stylesheets/style.css' rel='stylesheet'>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v1.9.1/mapbox-gl.css' rel='stylesheet'/>
+
+    <script src='https://api.mapbox.com/mapbox-gl-js/v1.9.1/mapbox-gl.js'></script>
+    <script src='https://d3js.org/d3.v5.min.js'></script>
+</head>
+
+<body>
+
+<div class='spinner-background' id='spinner'>
+    <div class='spinner'></div>
+</div>
+
+<div id='map'></div>
+
+<div class='map-overlay top'>
+    <div class='map-overlay-inner'>
+        <h1>Bike Stations Rank</h1>
+        <p><strong>Rank of the stations - 2019</strong></p>
+        <h2>Month: <label id='active-month'>January</label></h2>
+        <label>
+            <input class='input-slider' id='month-slider' max='11' min='0' step='1' type='range' value='0'/>
+        </label>
+    </div>
+    <div class='map-overlay-inner'>
+        <h2>Show / Hide all links</h2>
+        <label class='switch'>
+            <input id='links-checkbox' type='checkbox'>
+            <span class='slider'></span>
+        </label>
+    </div>
+    <div class='map-overlay-inner'>
+        <h2>Station details</h2>
+        <div><strong>Station:</strong> <span id='sid'></span></div>
+        <div><strong>Location:</strong> <span id='loc'></span></div>
+        <div><strong>Rank:</strong> <span id='rank'></span></div>
+        <dl>
+            <dt class='in-color'></dt>
+            <dd>Incoming links</dd>
+            <dt class='out-color'></dt>
+            <dd>Outgoing links</dd>
+        </dl>
+    </div>
+    <div class='map-overlay-inner'>
+        <div class='legend' id='legend'>
+            <h2>Rank intensity</h2>
+            <div class='color-bar'></div>
+            <div class='color-labels'>
+                <div class='label'>MIN</div>
+                <div class='free-label'></div>
+                <div class='label'>MAX</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src='./js/geoJson.js'></script>
+<script src='./js/properties.js'></script>
+<script src='./js/data.js'></script>
+<script src='./js/map.js'></script>
+
+<script>readData(files).then(drawData)</script>
+
+</body>
+</html>
