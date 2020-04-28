@@ -16,7 +16,6 @@ trait SparkApp {
       setupLogging(spark)
 
       run(args, spark)
-      spark.stop()
    }
 
 

@@ -1,6 +1,7 @@
 package pagerank
 
-import org.apache.spark.rdd.RDD
+import java.io.File
+
 import org.apache.hadoop.fs.{FileSystem, FileUtil, Path}
 import org.apache.hadoop.io.compress.CompressionCodec
 import org.apache.spark.sql.{DataFrame, Row}
@@ -30,8 +31,6 @@ object Utils {
             .option("header", "true")
             .save(s"$path.tmp")
 
-
-
          // Merge the folder of resulting part-xxxxx into one file:
          hdfs.delete(new Path(path), true) // to make sure it's not there already
          FileUtil.copyMerge(
@@ -39,9 +38,20 @@ object Utils {
             hdfs, new Path(path + ".csv"),
             true, df.sparkSession.sparkContext.hadoopConfiguration, null
          )
-         // Working with Hadoop 3?: https://stackoverflow.com/a/50545815/9297144
 
          hdfs.delete(new Path(s"$path.tmp"), true)
+      }
+   }
+
+   /*
+      Returns a list of the files in a specified folder
+    */
+   def getListOfFiles(dir: String): List[File] = {
+      val d = new File(dir)
+      if (d.exists && d.isDirectory) {
+         d.listFiles.filter(_.isFile).toList
+      } else {
+         List[File]()
       }
    }
 

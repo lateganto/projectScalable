@@ -1,26 +1,16 @@
 package pagerank
 
-import java.io.File
-
 import org.apache.spark.sql.SparkSession
 import org.kohsuke.args4j.{CmdLineParser, Option}
-
-/*class MyRunnable extends Runnable {
-
-   override def run(): Unit = {
-
-   }
-
-}*/
-
+import Utils._
 
 object Main extends SparkApp {
 
    class Options {
-      @Option(name = "--input", usage = "Input path containing starting and ending stations in CSV format (start_station, end_station, month)", required = true)
+      @Option(name = "--input_dir", usage = "Input directory path containing data of the stations in CSV format (start_station, end_station)", required = true)
       var input: String = _
 
-      @Option(name = "--output_folder", usage = "Output directory for the files containing the rank values for every station" /*, required = true*/)
+      @Option(name = "--output_dir", usage = "Output directory path for the rank and links CSV files", required = true)
       var output: String = _
 
       @Option(name = "--numIterations", usage = "Number of iterations to use for the PageRank algorithm, default=10")
@@ -38,35 +28,24 @@ object Main extends SparkApp {
 
       val sc = spark.sparkContext
 
-      val listFiles = getListOfFiles(options.input)
+      for (file <- getListOfFiles(options.input)) {
+         val thread = new Thread {
+            override def run(): Unit = {
+               println("FILE: " + file.getPath)
+               val graph = GraphBuilder.buildGraph(sc, file.getPath)
+               graph.saveEdges(options.output + "links_" + file.getName.split("-")(0), spark)
 
-      for (file <- listFiles) {
-         println("FILE: " + file.getPath)
-         val graph = GraphBuilder.buildGraph(sc, file.getPath)
-         graph.saveEdges("data/output/links_" + file.getName.split("-")(0), spark)
+               val newgraph = PageRank.calculatePR(graph, options.dampingFactor, options.numIterations)
+               newgraph.saveNodes(options.output + "ranks_" + file.getName.split("-")(0), spark)
 
-         val newgraph = PageRank.calculatePR(graph, options.dampingFactor, options.numIterations)
-         newgraph.saveNodes("data/output/ranks_" + file.getName.split("-")(0), spark)
+            }
+         }
+
+         thread.start()
       }
 
-      //      val graph = GraphBuilder.buildGraph(sc, options.input)
-      //
-      //      graph.saveEdges("data/output/edges1.csv", spark)
-      //
-      //      val newgraph = PageRank.calculatePR(graph, options.dampingFactor, options.numIterations)
-      //
-      //      newgraph.saveNodes("data/output/nodes1.csv", spark)
+//      spark.stop()
 
-
-   }
-
-   def getListOfFiles(dir: String): List[File] = {
-      val d = new File(dir)
-      if (d.exists && d.isDirectory) {
-         d.listFiles.filter(_.isFile).toList
-      } else {
-         List[File]()
-      }
    }
 
 }
