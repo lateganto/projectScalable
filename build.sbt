@@ -5,6 +5,7 @@ scalaVersion := "2.12.10"
 val spark_version = "2.4.5"
 
 libraryDependencies ++= Seq(
+   "args4j" % "args4j" % "2.0.31",
    "org.apache.spark" %% "spark-core" % spark_version,
    "org.apache.spark" %% "spark-sql" % spark_version,
    "org.apache.spark" %% "spark-graphx" % spark_version

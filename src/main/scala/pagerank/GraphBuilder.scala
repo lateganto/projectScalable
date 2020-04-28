@@ -13,9 +13,10 @@ object GraphBuilder {
          (idx, iter) => if (idx == 0) iter.drop(1) else iter
       }.map { row => row.split(",") }
          .map { cols =>
-            ((cols(3).replaceAll("\"", "").toInt,
-               cols(5).replaceAll("\"", "").toInt),
-               1)
+            ((
+               cols(3).replaceAll("\"", "").toInt, //start station
+               cols(5).replaceAll("\"", "").toInt //end station
+            ), 1)
          }
 
       // create weighted edges discarding self link
@@ -23,7 +24,7 @@ object GraphBuilder {
          .filter(row => row._1._1 != row._1._2) // deletes self link
          .reduceByKey((x, y) => x + y)
          .map {
-            case ((x, y), z) => Edge(x, y, z)
+            case ((src, dst), weigth) => Edge(src, dst, weigth)
          }
 
       val edges = normalizeOutEdgeWeights(weightedEdges)

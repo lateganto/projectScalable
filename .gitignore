@@ -1,0 +1,4 @@
+/src/main/scala/worksheet/
+*.sc
+/data/input/aaa/
+/data/output/Nuova cartella/
