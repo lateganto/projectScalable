@@ -13,8 +13,9 @@
 
 <body>
 
-<div class='spinner-background' id='spinner'>
-    <div class='spinner'></div>
+<div class='spinner-background' id='spinner-background'>
+    <div class='spinner' id='spinner'></div>
+    <div class='spinner-text'><label id='spinner-text'>Loading</label></div>
 </div>
 
 <div id='map'></div>
@@ -65,7 +66,12 @@
 <script src='./js/data.js'></script>
 <script src='./js/map.js'></script>
 
-<script>readData(files).then(drawData)</script>
+<script>
+    readData.then(drawData)
+        .catch(err =>  {
+            spinnerText.textContent = err.toString()
+        });
+</script>
 
 </body>
 </html>

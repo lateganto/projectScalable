@@ -1,26 +1,41 @@
-function readData(files) {
-    typeFiles = [
-        [files.stations, typeStation],
-        [files.ranks, typeRank],
-        [files.links, typeLink]
-    ]
+readData = d3.json(jsonUrl).then(function (json) {
+    spinnerText.textContent = 'Reading files location'
 
-    return Promise.all(typeFiles.map(url => d3.csv(url[0], url[1])))
-        .then(processData);
+    return Promise.all(
+        [d3.csv(json.files.stations, typeStation),
+            collectData(json.files.ranks, typeRank),
+            collectData(json.files.links, typeLink)]
+    ).then(processData)
+        .catch(err => {
+            throw err
+        });
+
+}).catch(err => {
+    throw err
+});
+
+async function collectData(urls, typeData) {
+    spinnerText.textContent = 'Collecting files'
+
+    return Promise.all(urls.map(url => d3.csv(url, typeData)))
 }
 
 function processData(rawData) {
+    spinnerText.textContent = 'Processing data'
+
+    console.log(rawData)
     stations = {};
     rawData[0].forEach(function (station) {
         stations[station.station] = station;
     });
 
-    ranks = rawData[1]
-    links = rawData[2]
+    console.log(stations)
 
-    geoStations = processStations(stations, ranks)
-    geoLinks = processLinks(stations, links)
+    geoStations = rawData[1].map(ranks => processStations(stations, ranks))
+    geoLinks = rawData[2].map(links => processLinks(stations, links))
 
+    console.log(geoStations)
+    console.log(geoLinks)
     return {
         'stations': geoStations,
         'links': geoLinks
@@ -58,8 +73,7 @@ function typeStation(s) {
 function typeRank(r) {
     return {
         station: +r.station,
-        rank: +r.rank,
-        month: +r.month
+        rank: +r.rank * rankFactor
     }
 }
 
@@ -67,7 +81,6 @@ function typeLink(l) {
     return {
         source_id: +l.source,
         target_id: +l.target,
-        weight: +l.weight,
-        month: +l.month
+        weight: +l.weight
     }
 }

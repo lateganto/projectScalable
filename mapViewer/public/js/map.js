@@ -1,4 +1,6 @@
 function drawData(data) {
+    spinnerText.textContent = 'Drawing Map'
+
     map = getMap()
     layers = ['links', 'stations']
 
@@ -6,9 +8,9 @@ function drawData(data) {
     setMapInteraction(layers)
 
     setToggleableLayer(map, layers[0])
-    setMonthSlider(map, layers)
+    setMonthSlider(map, layers, data)
 
-    spinner.remove()
+    spinnerBackground.remove()
 }
 
 function getMap() {
@@ -31,17 +33,19 @@ function loadMapLayers(map, layerIDs, data) {
     linksLayerId = layerIDs[0]
     stationsLayerId = layerIDs[1]
 
-    map.on('load', function() {
-        map.addSource(linksLayerId, {
-            type: 'geojson',
-            data: data.links
-        });
+    map.on('load', function () {
+        map.addSource(
+            linksLayerId, {
+                type: 'geojson',
+                data: data.links[0]
+            });
 
-        map.addSource(stationsLayerId, {
-            type: 'geojson',
-            data: data.stations,
-            generateId: true     // This ensures that all features have unique IDs
-        });
+        map.addSource(
+            stationsLayerId, {
+                type: 'geojson',
+                data: data.stations[0],
+                generateId: true     // This ensures that all features have unique IDs
+            });
 
         map.addLayer({
             id: linksLayerId,
@@ -61,8 +65,7 @@ function loadMapLayers(map, layerIDs, data) {
                     ],
                 'line-color': linkColors[0],
                 'line-opacity': 0.75
-            },
-            filter: ['==', ['number', ['get', 'month']], 1]
+            }
         });
 
         map.addLayer({
@@ -96,8 +99,7 @@ function loadMapLayers(map, layerIDs, data) {
                 'circle-stroke-color': 'white',
                 'circle-stroke-width': 1,
                 'circle-opacity': 0.95
-            },
-            filter: ['==', ['number', ['get', 'month']], 1]
+            }
         });
 
     });
@@ -108,7 +110,7 @@ function setMapInteraction(layers) {
     inLinksLayer = null;
     outLinksLayer = null;
 
-    map.on('mouseenter', layers[1], function(e) {
+    map.on('mouseenter', layers[1], function (e) {
         map.getCanvas().style.cursor = 'pointer';
 
         stationIdDisplay.textContent = e.features[0].properties.station;
@@ -127,19 +129,16 @@ function setMapInteraction(layers) {
         map.setFeatureState({
             source: layers[1],
             id: stationId,
-        }, { hover: true });
+        }, {hover: true});
 
-        monthFilter = ['==', ['number', ['get', 'month']], e.features[0].properties.month]
-        outFilter = ['==', ['number',['get', 'source_id']], e.features[0].properties.station]
-        inFilter = ['==', ['number',['get', 'target_id']], e.features[0].properties.station]
+        outFilter = ['==', ['number', ['get', 'source_id']], e.features[0].properties.station]
+        inFilter = ['==', ['number', ['get', 'target_id']], e.features[0].properties.station]
 
-        outLinksLayer =
-            addStationLinksLayer(map, layers, 'outStLinks', [outFilter, monthFilter], linkColors[2])
-        inLinksLayer =
-            addStationLinksLayer(map, layers, 'inStLinks', [inFilter, monthFilter], linkColors[1])
+        outLinksLayer = addStationLinksLayer(map, layers, 'outStLinks', outFilter, linkColors[2])
+        inLinksLayer = addStationLinksLayer(map, layers, 'inStLinks', inFilter, linkColors[1])
     });
 
-    map.on('mouseleave', layers[1], function() {
+    map.on('mouseleave', layers[1], function () {
         map.getCanvas().style.cursor = '';
 
         if (stationId !== null) {
@@ -168,12 +167,12 @@ function setMapInteraction(layers) {
     });
 
     // Center the map on the coordinates of any clicked symbol from the 'symbols' layer.
-    map.on('click', layers[1], function(e) {
-        map.flyTo({ center: e.features[0].geometry.coordinates });
+    map.on('click', layers[1], function (e) {
+        map.flyTo({center: e.features[0].geometry.coordinates});
     });
 }
 
-function addStationLinksLayer(map, baseLayers, layerId, filters, color) {
+function addStationLinksLayer(map, baseLayers, layerId, filter, color) {
     map.addLayer({
         id: layerId,
         type: 'line',
@@ -190,8 +189,7 @@ function addStationLinksLayer(map, baseLayers, layerId, filters, color) {
             ],
             'line-color': color,
             'line-opacity': 0.75
-        },
-        filter: ['all', filters[0], filters[1]]
+        }, filter: filter
     }, baseLayers[1]);
 
     return layerId
@@ -212,13 +210,13 @@ function setToggleableLayer(map, layerId) {
     });
 }
 
-function setMonthSlider(map, layers) {
+function setMonthSlider(map, layers, data) {
     monthSlider.addEventListener('input', function (e) {
-        month = parseInt(e.target.value) + 1;
-        monthName = monthLiteral[month - 1]
+        month = parseInt(e.target.value);
+        monthName = monthLiteral[month]
 
-        map.setFilter(layers[1], ['==', ['number', ['get', 'month']], month]);
-        map.setFilter(layers[0], ['==', ['number', ['get', 'month']], month]);
+        map.getSource(layers[0]).setData(data.links[month]);
+        map.getSource(layers[1]).setData(data.stations[month]);
 
         activeMonthLabel.innerText = monthName;
     });
