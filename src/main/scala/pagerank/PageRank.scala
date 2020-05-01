@@ -1,15 +1,22 @@
 package pagerank
 
 import org.apache.spark.rdd.RDD
+import Utils.log_print
 
 object PageRank {
 
    def calculatePR(graph: PageRankGraph, damping_factor: Double, n_iter: Int): PageRankGraph = {
 
-      graph.vertices.unpersist()
+      val start_time = System.nanoTime()
+      val current_thread = Thread.currentThread().getName
+
+      log_print("STARTING PAGERANK...", current_thread)
 
       var iteration = 0
       var updatedVertices: RichVertexPairRDD = graph.vertices
+      graph.vertices.unpersist()
+      updatedVertices.persist()
+
       while (iteration < n_iter) {
 
          //sum of the PR_values of dangling nodes
@@ -20,7 +27,7 @@ object PageRank {
             )
             .sum()
 
-         println("danglesum is: " + danglesum)
+         log_print("ITERATION " + iteration + ". " + "Danglesum is: " + danglesum, current_thread)
 
          /* Compute the incoming contributions for each vertex.
             (Every node sends to the adjacent nodes a contribution proportional to the
@@ -44,7 +51,9 @@ object PageRank {
          iteration += 1
       }
 
-      PageRankGraph(graph.numVertices, updatedVertices.persist(), graph.edges)
+      log_print(s"PAGERANK DONE! > Elapsed time: ${(System.nanoTime - start_time)/1000000000f}s" , current_thread)
+
+      PageRankGraph(graph.numVertices, updatedVertices, graph.edges)
 
    }
 

@@ -2,24 +2,51 @@ package pagerank
 
 import java.io.File
 
-import org.apache.hadoop.fs.{FileSystem, FileUtil, Path}
-import org.apache.hadoop.io.compress.CompressionCodec
-import org.apache.spark.sql.{DataFrame, Row}
+import org.apache.spark.sql.SparkSession
+
+import scala.reflect.io.Directory
 
 object Utils {
 
    /*
-      Class that helps saving an RDD to a CSV format file without unnecessary other files that Spark produces
+      Returns a list of the files in a specified folder
     */
+   def getListOfFiles(dir: String): List[File] = {
+      val d = new File(dir)
+      if (d.exists && d.isDirectory) {
+         d.listFiles.filter(_.isFile).toList
+      } else {
+         List[File]()
+      }
+   }
+
+   def log_print(msg: String, thread_name: String): Unit = {
+      println("[" + thread_name + "] --- " + msg)
+   }
+
+   def log_print(msg: String): Unit = {
+      println(msg)
+   }
+
+   def deleteFolderIfExists(path: String): Unit = {
+      val file = new File(path)
+      val directory = new Directory(file)
+      if (directory.exists) {
+         directory.deleteRecursively()
+      }
+   }
+
+   def setupLogging(spark: SparkSession): Unit =
+      spark.sparkContext.setLogLevel("WARN")
+
+   /*
+
+
+      Class that helps saving an RDD to a CSV format file without unnecessary other files that Spark produces
+
    implicit class DFExtensions(val df: DataFrame) extends AnyVal {
 
-      def saveAsSingleTextFile[U](path: String): Unit =
-         saveAsSingleTextFileInternal(path, None)
-
-      private def saveAsSingleTextFileInternal[U](
-                                                    path: String,
-                                                    codec: Option[Class[_ <: CompressionCodec]]): Unit = {
-
+      def saveAsSingleTextFile(path: String): Unit = {
          // The interface with hdfs:
          val hdfs = FileSystem.get(df.sparkSession.sparkContext.hadoopConfiguration)
 
@@ -41,18 +68,5 @@ object Utils {
 
          hdfs.delete(new Path(s"$path.tmp"), true)
       }
-   }
-
-   /*
-      Returns a list of the files in a specified folder
-    */
-   def getListOfFiles(dir: String): List[File] = {
-      val d = new File(dir)
-      if (d.exists && d.isDirectory) {
-         d.listFiles.filter(_.isFile).toList
-      } else {
-         List[File]()
-      }
-   }
-
+   }*/
 }

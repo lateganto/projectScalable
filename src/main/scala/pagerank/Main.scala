@@ -1,51 +1,77 @@
 package pagerank
 
 import org.apache.spark.sql.SparkSession
-import org.kohsuke.args4j.{CmdLineParser, Option}
-import Utils._
+import Utils.{getListOfFiles, log_print}
+
 
 object Main extends SparkApp {
 
-   class Options {
-      @Option(name = "--input_dir", usage = "Input directory path containing data of the stations in CSV format (start_station, end_station)", required = true)
-      var input: String = _
-
-      @Option(name = "--output_dir", usage = "Output directory path for the rank and links CSV files", required = true)
-      var output: String = _
-
-      @Option(name = "--numIterations", usage = "Number of iterations to use for the PageRank algorithm, default=10")
-      var numIterations: Int = 10
-
-      @Option(name = "--dampingFactor", usage = "Damping parameter for PageRank, default=0.85")
-      var dampingFactor: Double = 0.85
-   }
-
-   override def run(args: Array[String], spark: SparkSession): Unit = {
-
-      val options = new Options()
-
-      new CmdLineParser(options).parseArgument(args: _*)
+   override def run(options: Options, spark: SparkSession): Unit = {
 
       val sc = spark.sparkContext
 
-      for (file <- getListOfFiles(options.input)) {
-         val thread = new Thread {
-            override def run(): Unit = {
-               println("FILE: " + file.getPath)
-               val graph = GraphBuilder.buildGraph(sc, file.getPath)
-               graph.saveEdges(options.output + "links_" + file.getName.split("-")(0), spark)
+      val start_time = System.nanoTime()
 
-               val newgraph = PageRank.calculatePR(graph, options.dampingFactor, options.numIterations)
-               newgraph.saveNodes(options.output + "ranks_" + file.getName.split("-")(0), spark)
+      val input_dir = options.input_dir
+      val input_file = options.input_file
+      val output_dir = options.output_dir
 
+      if (options.local) {
+
+         var threads_list = List[Thread]()
+
+         for (file <- getListOfFiles(options.input_dir)) {
+            val thread = new Thread {
+               override def run(): Unit = {
+                  val thread_name = getName
+
+                  log_print("STARTING COMPUTATION...", thread_name)
+
+                  val graph = GraphBuilder.buildGraph(sc, file.getPath)
+                  graph.saveEdges(output_dir + "links_" + file.getName.split("-")(0), spark, options.local)
+
+                  val newgraph = PageRank.calculatePR(graph, options.dampingFactor, options.numIterations)
+                  newgraph.saveNodes(output_dir + "ranks_" + file.getName.split("-")(0), spark, options.local)
+               }
+            }
+
+            threads_list = thread :: threads_list
+
+            thread.start()
+         }
+
+         waitIfAliveThreads(threads_list)
+
+      } else {
+         log_print("STARTING COMPUTATION...")
+
+         val graph = GraphBuilder.buildGraph(sc, input_dir + input_file)
+         graph.saveEdges(output_dir + "_links", spark, options.local)
+
+         val newgraph = PageRank.calculatePR(graph, options.dampingFactor, options.numIterations)
+         newgraph.saveNodes(output_dir + "_ranks", spark, options.local)
+      }
+
+      println(s"**** COMPUTATION FINISHED! > Elapsed time: ${(System.nanoTime() - start_time) / 1000000000f}s ****")
+
+   }
+
+
+   def waitIfAliveThreads(threads_list: List[Thread]): Unit = {
+
+      var some_alive = true
+
+      while (some_alive) {
+         some_alive = false
+         for (thread <- threads_list) {
+            if (thread.isAlive) {
+               some_alive = true
             }
          }
 
-         thread.start()
+         if (some_alive)
+            Thread.sleep(5000)
       }
-
-//      spark.stop()
-
    }
 
 }

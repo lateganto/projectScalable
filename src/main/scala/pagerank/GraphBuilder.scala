@@ -2,20 +2,26 @@ package pagerank
 
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
+import Utils.log_print
 
 
 object GraphBuilder {
 
    def buildGraph(sc: SparkContext, input: String): PageRankGraph = {
+      val start_time = System.nanoTime()
+      val current_tread = Thread.currentThread.getName
+
+      log_print("STARTING GRAPH BUILDER...", current_tread)
+      log_print("[GRAPH BUILDER] - Reading data from: " + input, current_tread)
 
       // read the data from input file discarding the first line
       val allEdges = sc.textFile(input).mapPartitionsWithIndex {
-         (idx, iter) => if (idx == 0) iter.drop(1) else iter
+         (idx, iter) => if (idx == 0) iter.drop(1) else iter // deletes the first row (header)
       }.map { row => row.split(",") }
          .map { cols =>
             ((
-               cols(3).replaceAll("\"", "").toInt, //start station
-               cols(5).replaceAll("\"", "").toInt //end station
+               cols(3).replaceAll("\"", "").toInt, // start station
+               cols(5).replaceAll("\"", "").toInt // end station
             ), 1)
          }
 
@@ -29,7 +35,12 @@ object GraphBuilder {
 
       val edges = normalizeOutEdgeWeights(weightedEdges)
 
-      fromEdgesToGraph(edges)
+      val output = fromEdgesToGraph(edges)
+
+      log_print(s"GRAPH BUILT! > Elapsed time: ${(System.nanoTime - start_time)/1000000000f}s", current_tread)
+      log_print("Nodes: " + output.numVertices + ", Links: " + output.edges.count(), Thread.currentThread().getName)
+
+      output
    }
 
    /*
@@ -69,6 +80,8 @@ object GraphBuilder {
       val finalEdges = edges
          .map(_.toOutEdgePair)
          .persist()
+
+      edges.unpersist()
 
       val finalVertices = vertices
          .join(dangles)

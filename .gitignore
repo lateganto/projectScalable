@@ -1,3 +1,2 @@
-/src/main/scala/worksheet/
 *.sc
-/data/output
+/data/
