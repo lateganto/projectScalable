@@ -1,0 +1,33 @@
+{
+  "files": {
+    "stations": "https://dl.dropbox.com/s/w428ej85gj2mehc/stations.csv",
+    "ranks": [
+      "https://dl.dropbox.com/s/g3dkgjli6778g5l/ranks_201901.csv",
+      "https://dl.dropbox.com/s/d4mgkptxdcn8dkc/ranks_201902.csv",
+      "https://dl.dropbox.com/s/3lk1fy4gdp38y4s/ranks_201903.csv",
+      "https://dl.dropbox.com/s/hcpbzaa3cxob758/ranks_201904.csv",
+      "https://dl.dropbox.com/s/zudn362u29mnr6i/ranks_201905.csv",
+      "https://dl.dropbox.com/s/89q0unzs2t5r84q/ranks_201906.csv",
+      "https://dl.dropbox.com/s/sh4ne7o5s5dethm/ranks_201907.csv",
+      "https://dl.dropbox.com/s/jzfa1ipd7ckvf9c/ranks_201908.csv",
+      "https://dl.dropbox.com/s/mk8hqxhvlb7p2x3/ranks_201909.csv",
+      "https://dl.dropbox.com/s/6hanr8fjigntp21/ranks_201910.csv",
+      "https://dl.dropbox.com/s/sm8tge4mu1p6s1b/ranks_201911.csv",
+      "https://dl.dropbox.com/s/ru2gurarec4k04v/ranks_201912.csv"
+    ],
+    "links": [
+      "https://dl.dropbox.com/s/8azt9hc10f5m07e/links_201901.csv",
+      "https://dl.dropbox.com/s/i2u1hbeahggp0j1/links_201902.csv",
+      "https://dl.dropbox.com/s/72ktbj44k8qu39c/links_201903.csv",
+      "https://dl.dropbox.com/s/i1hokfclh8gizw0/links_201904.csv",
+      "https://dl.dropbox.com/s/jowuiwb5hgw87fj/links_201905.csv",
+      "https://dl.dropbox.com/s/1kr0wozjm5x79w3/links_201906.csv",
+      "https://dl.dropbox.com/s/68iixas1nxlj6e5/links_201907.csv",
+      "https://dl.dropbox.com/s/767iaa3wre0ptdg/links_201908.csv",
+      "https://dl.dropbox.com/s/nyuchk6a4r7dagt/links_201909.csv",
+      "https://dl.dropbox.com/s/2yjm3jn0qtzg4ec/links_201910.csv",
+      "https://dl.dropbox.com/s/beumgkcg726mapz/links_201911.csv",
+      "https://dl.dropbox.com/s/tdim1ni3bx4yol5/links_201912.csv"
+    ]
+  }
+}

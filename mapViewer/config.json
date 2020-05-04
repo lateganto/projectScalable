@@ -1,0 +1,69 @@
+{
+  "keyFilename": "key.json",
+  "gcp": {
+    "projectId": "scalable-pagerank",
+    "location": "us-central1",
+    "bucket": {
+      "bucketName": "scalable-pagerank-bucket-1",
+      "storageClass": "standard"
+    },
+    "cluster": {
+      "clusterName": "scalable-pagerank-cluster-4",
+      "config": {
+        "masterConfig": {
+          "numInstances": 1,
+          "machineTypeUri": "n1-standard-2",
+          "diskConfig": {
+            "bootDiskSizeGb": 30,
+            "bootDiskType": "pd-ssd"
+          }
+        },
+        "workerConfig": {
+          "numInstances": 3,
+          "machineTypeUri": "n1-standard-2",
+          "diskConfig": {
+            "bootDiskSizeGb": 30,
+            "bootDiskType": "pd-ssd"
+          }
+        },
+        "softwareConfig": {
+          "imageVersion":  "1.5-debian10"
+        }
+      }
+    },
+    "job": {
+      "jarFileDir": "../data",
+      "jarFileName": "projectScalable-0.1.jar",
+      "jarArgs": {
+        "inputDir": "--input_dir",
+        "inputFile": "--input_file",
+        "outputDir": "--output_dir"
+      }
+    }
+  },
+  "input" : {
+    "inputPath": "../data/input",
+    "inputFileNames": [
+      "201901-capitalbikeshare-tripdata.csv",
+      "201902-capitalbikeshare-tripdata.csv",
+      "201903-capitalbikeshare-tripdata.csv",
+      "201904-capitalbikeshare-tripdata.csv",
+      "201905-capitalbikeshare-tripdata.csv",
+      "201906-capitalbikeshare-tripdata.csv",
+      "201907-capitalbikeshare-tripdata.csv",
+      "201908-capitalbikeshare-tripdata.csv",
+      "201909-capitalbikeshare-tripdata.csv",
+      "201910-capitalbikeshare-tripdata.csv",
+      "201911-capitalbikeshare-tripdata.csv",
+      "201912-capitalbikeshare-tripdata.csv"
+    ]
+  },
+  "output": {
+    "typeResults": [
+      "links",
+      "ranks"
+    ],
+    "publicDir": "./public",
+    "dataDir": "/data"
+  }
+}
