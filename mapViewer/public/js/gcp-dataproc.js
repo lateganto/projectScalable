@@ -99,7 +99,7 @@ function standardFail(jqXHR, textStatus, errorThrown) {
 
 function criticalFail(jqXHR, textStatus, errorThrown) {
     spinner.remove();
-    spinnerText.textContent = criticalFailMessage;
+    spinnerText.textContent = `${errorThrown}  -  ${criticalFailMessage}`;
 }
 
 function onTaskFailed() {
