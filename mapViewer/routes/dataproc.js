@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 
 const sleep = require('sleep');
-const fs = require('fs');
 
 const config = require('../config.json');
 
@@ -94,11 +93,11 @@ router.get('/uploadFiles', function (req, res, next) {
 });
 
 
-router.get('/submitJobs', function (req, res, next) {
+router.get('/submitJob', function (req, res, next) {
     var run = JSON.parse(req.query.run);
 
     if (run === true) {
-        submitJobs()
+        submitJob()
             .then(() => {
                 done = true
             })
@@ -139,18 +138,13 @@ router.get('/deleteAll', function (req, res, next) {
 
     if (run === true) {
 
-        deleteAllResources({
-            projectId: 'scalable-pagerank',
-            location: 'us-central1',
-            clusterName: 'scalable-pagerank-cluster-4',
-            bucketName: 'scalable-pagerank-bucket-1'
-
-        }).then(() => {
+        deleteAllResources()
+            .then(() => {
                 done = true
-            }
-        ).catch(e => {
-            error = e.message
-        });
+            })
+            .catch(e => {
+                error = e.message}
+            );
 
         run = false;
         done = false;
@@ -245,11 +239,23 @@ async function uploadFile(options) {
 
 
 async function uploadFiles() {
-    const inputFileNames = config.input.inputFileNames;
+    const inputFileNames = config.input.inputLinksFiles;
     const inputPath = config.input.inputPath;
     const bucketName = config.gcp.bucket.bucketName;
     const jarFileDir = config.gcp.job.jarFileDir;
     const jarFileName = config.gcp.job.jarFileName;
+    const jarConfig = config.gcp.job.jarConfig;
+
+    jarConfig.inputDir = `gs://${bucketName}`;
+    jarConfig.outputDir = `gs://${bucketName}`;
+    jarConfig.inputFiles = config.input.inputLinksFiles;
+
+    const jarConfigName = config.gcp.job.jarConfigName;
+    const jarConfigFile = storage.bucket(bucketName).file(jarConfigName);
+
+    await jarConfigFile.save(JSON.stringify(jarConfig));
+
+    console.log(`File Config uploaded to ${jarConfigName}.`);
 
     var uploads = []
     uploads.push(uploadFile({filename: `${jarFileDir}/${jarFileName}`, bucketName: bucketName}));
@@ -263,14 +269,15 @@ async function uploadFiles() {
 }
 
 
-async function submitJob(options) {
-    const projectId = options.projectId;
-    const location = options.location;
-    const bucketName = options.bucketName;
-    const jarFileName = options.jarFileName;
-    const jarArgs = options.jarArgs;
-    const clusterName = options.clusterName;
+async function submitJob() {
+    const projectId = config.gcp.projectId;
+    const location = config.gcp.location;
+    const bucketName = config.gcp.bucket.bucketName;
+    const jarFileName = config.gcp.job.jarFileName;
+    const clusterName = config.gcp.cluster.clusterName;
+    const jarConfigName = config.gcp.job.jarConfigName;
 
+    const jarArgs = [`gs://${bucketName}/${jarConfigName}`];
     const mainJarFileUri = `gs://${bucketName}/${jarFileName}`
 
     const job = {
@@ -343,14 +350,20 @@ async function submitJob(options) {
 }
 
 
+/*
 async function submitJobs() {
     const projectId = config.gcp.projectId;
     const location = config.gcp.location;
     const bucketName = config.gcp.bucket.bucketName;
     const jarFileName = config.gcp.job.jarFileName;
-    const inputFileNames = config.input.inputFileNames;
+    const inputFileNames = config.input.inputLinksFiles;
     const clusterName = config.gcp.cluster.clusterName;
-    const jarArgs = config.gcp.job.jarArgs;
+
+    // TODO carico prima il file qui lo linko solo: gs:// docet
+    //const jarArgs = config.gcp.job.jarArgs;
+
+
+
 
     var jobs = [];
     for (var i = 0; i < inputFileNames.length; i++) {
@@ -368,11 +381,28 @@ async function submitJobs() {
                 ]
             })
         );
-    }
+
+        /*
+        await submitJob({
+            projectId: projectId,
+            location: location,
+            bucketName: bucketName,
+            jarFileName: jarFileName,
+            clusterName: clusterName,
+            jarArgs: [
+                `${jarArgs.inputDir}=gs://${bucketName}/`,
+                `${jarArgs.inputFile}=${inputFileNames[i]}`,
+                `${jarArgs.outputDir}=gs://${bucketName}/${inputFileNames[i]}`
+            ]
+        });
+         */
+    /*}
 
     await Promise.all(jobs);
+
     console.log(`All jobs finished`);
 }
+*/
 
 
 async function getJobResultFiles(options) {
@@ -390,8 +420,8 @@ async function getJobResultFiles(options) {
 
     const filename = files[0].name;
 
-    const jsonFilename = `.${dataDir}/${typeResult}_${inputFileName}`
-    const saveFilename = `${outputDir}/${typeResult}_${inputFileName}`
+    const jsonFilename = `.${dataDir}/${typeResult}_${inputFileName}`;
+    const saveFilename = `${outputDir}/${typeResult}_${inputFileName}`;
     await storage.bucket(bucketName).file(filename).download({
         destination: saveFilename
     })
@@ -406,7 +436,7 @@ async function getJobResultFiles(options) {
 async function donwloadResults() {
     const bucketName = config.gcp.bucket.bucketName;
     const typeResults = config.output.typeResults;
-    const inputFileNames = config.input.inputFileNames;
+    const inputFileNames = config.input.inputLinksFiles;
     const publicDir = config.output.publicDir;
     const dataDir = config.output.dataDir;
 
@@ -431,7 +461,6 @@ async function donwloadResults() {
             dataDir: dataDir,
             outputDir: outputDir
         }));
-
     }
 
     const links = await Promise.all(links_downloads);
@@ -442,7 +471,8 @@ async function donwloadResults() {
     const resultJson = {
         files: {
             //TODO to change with local file
-            stations: 'https://dl.dropbox.com/s/w428ej85gj2mehc/stations.csv',
+            //stations: 'https://dl.dropbox.com/s/w428ej85gj2mehc/stations.csv',
+            stations: `${outputDir}/${config.output.nodesFile}`,
             ranks: ranks,
             links: links
         }
@@ -461,7 +491,7 @@ async function donwloadResults() {
 }
 
 
-async function deleteAllResources(options) {
+async function deleteAllResources() {
     const projectId = config.gcp.projectId;
     const location = config.gcp.location;
     const clusterName = config.gcp.cluster.clusterName;

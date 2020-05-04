@@ -15,22 +15,22 @@ function createCluster() {
 
 function uploadFiles() {
     spinnerText.textContent = uploadFilesMessage;
-    getAndWait('/dataproc/uploadFiles', true, 2000, submitJobs, standardFail);
+    getAndWait('/dataproc/uploadFiles', true, 5000, submitJob, standardFail);
 }
 
-function submitJobs() {
+function submitJob() {
     spinnerText.textContent = submitJobsMessage;
-    getAndWait('/dataproc/submitJobs', true, 2000, downloadResults, standardFail);
+    getAndWait('/dataproc/submitJob', true, 5000, downloadResults, standardFail);
 }
 
 function downloadResults() {
     spinnerText.textContent = downloadResultsMessage;
-    getAndWait('/dataproc/downloadResults', true, 2000, deleteAll, standardFail);
+    getAndWait('/dataproc/downloadResults', true, 5000, deleteAll, standardFail);
 }
 
 function deleteAll() {
     spinnerText.textContent = deleteAllMessage;
-    getAndWait('/dataproc/deleteAll', true, 2000, launchMapViewer, standardFail);
+    getAndWait('/dataproc/deleteAll', true, 5000, launchMapViewer, standardFail);
 }
 
 function launchMapViewer() {
@@ -93,7 +93,7 @@ function standardFail(jqXHR, textStatus, errorThrown) {
     setTimeout(function () {
         spinner.hidden = false;
         spinnerText.textContent = deleteAllMessage;
-        getAndWait('/dataproc/deleteAll', true, 2000, onTaskFailed, criticalFail)
+        getAndWait('/dataproc/deleteAll', true, 5000, onTaskFailed, criticalFail)
     }, 10000);
 }
 

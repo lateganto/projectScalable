@@ -12,7 +12,7 @@
       "config": {
         "masterConfig": {
           "numInstances": 1,
-          "machineTypeUri": "n1-standard-2",
+          "machineTypeUri": "n2-standard-2",
           "diskConfig": {
             "bootDiskSizeGb": 30,
             "bootDiskType": "pd-ssd"
@@ -20,7 +20,7 @@
         },
         "workerConfig": {
           "numInstances": 3,
-          "machineTypeUri": "n1-standard-2",
+          "machineTypeUri": "n2-standard-2",
           "diskConfig": {
             "bootDiskSizeGb": 30,
             "bootDiskType": "pd-ssd"
@@ -28,22 +28,29 @@
         },
         "softwareConfig": {
           "imageVersion":  "1.5-debian10"
+        },
+        "lifecycleConfig": {
+          "idleDeleteTtl": "600s"
         }
       }
     },
     "job": {
       "jarFileDir": "../data",
-      "jarFileName": "projectScalable-0.1.jar",
-      "jarArgs": {
-        "inputDir": "--input_dir",
-        "inputFile": "--input_file",
-        "outputDir": "--output_dir"
+      "jarFileName": "projectScalable.jar",
+      "jarConfigName": "jarConfig.json",
+      "jarConfig": {
+        "inputDir": "",
+        "inputFiles": [],
+        "outputDir": "",
+        "numIterations": 10,
+        "dampingFactor": 0.85,
+        "local": false
       }
     }
   },
   "input" : {
     "inputPath": "../data/input",
-    "inputFileNames": [
+    "inputLinksFiles": [
       "201901-capitalbikeshare-tripdata.csv",
       "201902-capitalbikeshare-tripdata.csv",
       "201903-capitalbikeshare-tripdata.csv",
@@ -59,6 +66,7 @@
     ]
   },
   "output": {
+    "nodesFile": "capitalbikeshare-stations.csv",
     "typeResults": [
       "links",
       "ranks"
