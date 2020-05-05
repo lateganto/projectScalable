@@ -112,14 +112,14 @@ async function initClients() {
     storage = new Storage({projectId, keyFilename});
     console.log(`Storage for project ${projectId} created.`);
 
-    clusterClient = new dataproc.ClusterControllerClient({
+    clusterClient = new dataproc.v1beta2.ClusterControllerClient({
         apiEndpoint: `${location}-dataproc.googleapis.com`,
         keyFilename: keyFilename,
         projectId: projectId
     });
     console.log(`Cluster client for project ${projectId} created.`);
 
-    jobClient = new dataproc.v1.JobControllerClient({
+    jobClient = new dataproc.v1beta2.JobControllerClient({
         apiEndpoint: `${location}-dataproc.googleapis.com`,
         keyFilename: keyFilename,
         projectId: projectId

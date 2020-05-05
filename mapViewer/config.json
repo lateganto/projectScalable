@@ -12,7 +12,7 @@
       "config": {
         "masterConfig": {
           "numInstances": 1,
-          "machineTypeUri": "e2-standard-2",
+          "machineTypeUri": "n1-standard-2",
           "diskConfig": {
             "bootDiskSizeGb": 30,
             "bootDiskType": "pd-ssd"
@@ -20,7 +20,7 @@
         },
         "workerConfig": {
           "numInstances": 3,
-          "machineTypeUri": "e2-standard-2",
+          "machineTypeUri": "n1-standard-2",
           "diskConfig": {
             "bootDiskSizeGb": 30,
             "bootDiskType": "pd-ssd"
@@ -30,6 +30,7 @@
           "imageVersion":  "1.5-debian10"
         },
         "endpointConfig": {
+          "httpPorts": {},
           "enableHttpPortAccess": true
         }
       }

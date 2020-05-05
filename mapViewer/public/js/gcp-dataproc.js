@@ -49,7 +49,7 @@ function getAndWait(url, flag, delay, successCallback, failCallback) {
 
         } else if (recDone === false) {
             setTimeout(function () {
-                getAndWait(url, false, delay, successCallback, failCallback);  // Call the loop again after delay
+                getAndWait(url, false, delay, successCallback, failCallback);
             }, delay);
 
         } else {
@@ -73,7 +73,7 @@ function standardFail(jqXHR, textStatus, errorThrown) {
 
 function criticalFail(jqXHR, textStatus, errorThrown) {
     spinner.remove();
-    spinnerText.textContent = `${errorThrown}\n${criticalFailMessage}`;
+    spinnerText.textContent = `${errorThrown} - ${criticalFailMessage}`;
 }
 
 function onTaskFailed() {
