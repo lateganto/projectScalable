@@ -15,22 +15,22 @@ function createCluster() {
 
 function uploadFiles() {
     spinnerText.textContent = uploadFilesMessage;
-    getAndWait('/dataproc/uploadFiles', true, 2000, submitJobs, standardFail);
+    getAndWait('/dataproc/uploadFiles', true, 5000, submitJob, standardFail);
 }
 
-function submitJobs() {
+function submitJob() {
     spinnerText.textContent = submitJobsMessage;
-    getAndWait('/dataproc/submitJobs', true, 2000, downloadResults, standardFail);
+    getAndWait('/dataproc/submitJob', true, 5000, downloadResults, standardFail);
 }
 
 function downloadResults() {
     spinnerText.textContent = downloadResultsMessage;
-    getAndWait('/dataproc/downloadResults', true, 2000, deleteAll, standardFail);
+    getAndWait('/dataproc/downloadResults', true, 5000, deleteAll, standardFail);
 }
 
 function deleteAll() {
     spinnerText.textContent = deleteAllMessage;
-    getAndWait('/dataproc/deleteAll', true, 2000, launchMapViewer, standardFail);
+    getAndWait('/dataproc/deleteAll', true, 5000, launchMapViewer, criticalFail);
 }
 
 function launchMapViewer() {
@@ -41,65 +41,39 @@ function getAndWait(url, flag, delay, successCallback, failCallback) {
     console.log('sending flag: ' + flag)
 
     $.get(url, {run: flag}, function (data) {
-        const recRun = JSON.parse(data.run);
         const recDone = JSON.parse(data.done);
         const recError = data.error;
 
-        console.log('just received flags: ' + recRun + ' - ' + recDone + ' : ' + recError)
-
         if (recError !== null) {
-
-            console.log('calling fail');
-            console.log(recError);
             failCallback(null, null, recError);
 
         } else if (recDone === false) {
-
             setTimeout(function () {
-                getAndWait(url, false, delay, successCallback, failCallback);  // Call the loop again after delay
+                getAndWait(url, false, delay, successCallback, failCallback);
             }, delay);
 
         } else {
-            console.log('calling success');
             successCallback()
         }
 
-        /*
-        if (recDone === false && recError === null) {
-            setTimeout(function () {
-                getAndWait(url, false, delay, successCallback, failCallback);  // Call the loop again after delay
-            }, delay);
-        } else if (recError !== null) {
-
-            console.log('calling fail');
-            console.log(recError);
-            throw recError;
-
-        } else {
-            console.log('calling success');
-            successCallback()
-        }
-
-         */
     }).fail(failCallback)
 
 }
 
-
 function standardFail(jqXHR, textStatus, errorThrown) {
     spinner.hidden = true;
-    spinnerText.textContent = `${errorThrown}  -  Deleting All resources in 10 seconds.`;
+    spinnerText.textContent = `${errorThrown}\nDeleting All resources in 10 seconds.`;
 
     setTimeout(function () {
         spinner.hidden = false;
         spinnerText.textContent = deleteAllMessage;
-        getAndWait('/dataproc/deleteAll', true, 2000, onTaskFailed, criticalFail)
+        getAndWait('/dataproc/deleteAll', true, 5000, onTaskFailed, criticalFail)
     }, 10000);
 }
 
 function criticalFail(jqXHR, textStatus, errorThrown) {
     spinner.remove();
-    spinnerText.textContent = `${errorThrown}  -  ${criticalFailMessage}`;
+    spinnerText.textContent = `${errorThrown} - ${criticalFailMessage}`;
 }
 
 function onTaskFailed() {

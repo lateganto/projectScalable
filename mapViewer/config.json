@@ -28,22 +28,28 @@
         },
         "softwareConfig": {
           "imageVersion":  "1.5-debian10"
+        },
+        "endpointConfig": {
+          "httpPorts": {},
+          "enableHttpPortAccess": true
         }
       }
     },
     "job": {
       "jarFileDir": "../data",
-      "jarFileName": "projectScalable-0.1.jar",
+      "jarFileName": "projectScalable.jar",
       "jarArgs": {
-        "inputDir": "--input_dir",
-        "inputFile": "--input_file",
-        "outputDir": "--output_dir"
+        "inputDir": "--inputDir",
+        "outputDir": "--outputDir",
+        "numIterations": "--numIterations=10",
+        "dampingFactor": "--dampingFactor=0.85",
+        "local": "--local=false"
       }
     }
   },
   "input" : {
     "inputPath": "../data/input",
-    "inputFileNames": [
+    "inputLinksFiles": [
       "201901-capitalbikeshare-tripdata.csv",
       "201902-capitalbikeshare-tripdata.csv",
       "201903-capitalbikeshare-tripdata.csv",
@@ -59,6 +65,7 @@
     ]
   },
   "output": {
+    "nodesFile": "capitalbikeshare-stations.csv",
     "typeResults": [
       "links",
       "ranks"

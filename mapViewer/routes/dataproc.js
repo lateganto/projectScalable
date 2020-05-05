@@ -1,169 +1,108 @@
 var express = require('express');
 var router = express.Router();
 
-const sleep = require('sleep');
 const fs = require('fs');
-
+const sleep = require('sleep');
 const config = require('../config.json');
-
-// Imports the Google Cloud client library
 const {Storage} = require('@google-cloud/storage');
 const dataproc = require('@google-cloud/dataproc');
 
 let done = false;
 let error = null;
 
+function runRequest(request) {
+    done = false;
+    error = null;
+
+    request()
+        .then(() => {
+            done = true;
+        })
+        .catch(e => {
+            error = e.message;
+        });
+}
 
 router.get('/', function (req, res, next) {
     var run = JSON.parse(req.query.run);
 
     if (run === true) {
-        initClients()
-            .then(() => {
-                done = true
-            })
-            .catch(e => {
-                error = e.message
-            });
-
         run = false;
-        done = false;
+        runRequest(initClients);
     }
 
     res.status(200).json({done: done, run: run, error: error});
 });
-
 
 router.get('/createBucket', function (req, res, next) {
     var run = JSON.parse(req.query.run);
 
     if (run === true) {
-        createBucket()
-            .then(() => {
-                done = true
-            })
-            .catch(e => {
-                error = e.message
-            });
-
         run = false;
-        done = false;
+        runRequest(createBucket);
     }
 
     res.status(200).json({done: done, run: run, error: error});
 });
-
 
 router.get('/createCluster', function (req, res, next) {
     var run = JSON.parse(req.query.run);
 
     if (run === true) {
-        createCluster()
-            .then(() => {
-                done = true
-            })
-            .catch(e => {
-                error = e.message
-            });
-
         run = false;
-        done = false;
+        runRequest(createCluster);
     }
 
     res.status(200).json({done: done, run: run, error: error});
 });
-
 
 router.get('/uploadFiles', function (req, res, next) {
     var run = JSON.parse(req.query.run);
 
     if (run === true) {
-        uploadFiles()
-            .then(() => {
-                done = true
-            })
-            .catch(e => {
-                error = e.message
-            });
-
         run = false;
-        done = false;
+        runRequest(uploadFiles);
     }
 
     res.status(200).json({done: done, run: run, error: error});
 });
 
-
-router.get('/submitJobs', function (req, res, next) {
+router.get('/submitJob', function (req, res, next) {
     var run = JSON.parse(req.query.run);
 
     if (run === true) {
-        submitJobs()
-            .then(() => {
-                done = true
-            })
-            .catch(e => {
-                error = e.message
-            });
-
         run = false;
-        done = false;
+        runRequest(submitJob);
     }
 
     res.status(200).json({done: done, run: run, error: error});
 });
-
 
 router.get('/downloadResults', function (req, res, next) {
     var run = JSON.parse(req.query.run);
 
     if (run === true) {
-        donwloadResults()
-            .then(() => {
-                done = true
-            })
-            .catch(e => {
-                error = e.message
-            });
-
         run = false;
-        done = false;
+        runRequest(downloadResults);
     }
 
     res.status(200).json({done: done, run: run, error: error});
 });
-
 
 router.get('/deleteAll', function (req, res, next) {
     var run = JSON.parse(req.query.run);
 
     if (run === true) {
-
-        deleteAllResources({
-            projectId: 'scalable-pagerank',
-            location: 'us-central1',
-            clusterName: 'scalable-pagerank-cluster-4',
-            bucketName: 'scalable-pagerank-bucket-1'
-
-        }).then(() => {
-                done = true
-            }
-        ).catch(e => {
-            error = e.message
-        });
-
         run = false;
-        done = false;
+        runRequest(deleteAllResources);
     }
 
     res.status(200).json({done: done, run: run, error: error});
 });
 
-
 let storage = null;
 let clusterClient = null;
 let jobClient = null;
-
 
 async function initClients() {
     const projectId = config.gcp.projectId;
@@ -173,21 +112,20 @@ async function initClients() {
     storage = new Storage({projectId, keyFilename});
     console.log(`Storage for project ${projectId} created.`);
 
-    clusterClient = new dataproc.ClusterControllerClient({
+    clusterClient = new dataproc.v1beta2.ClusterControllerClient({
         apiEndpoint: `${location}-dataproc.googleapis.com`,
         keyFilename: keyFilename,
         projectId: projectId
     });
     console.log(`Cluster client for project ${projectId} created.`);
 
-    jobClient = new dataproc.v1.JobControllerClient({
+    jobClient = new dataproc.v1beta2.JobControllerClient({
         apiEndpoint: `${location}-dataproc.googleapis.com`,
         keyFilename: keyFilename,
         projectId: projectId
     });
     console.log(`Job client for project ${projectId} created.`);
 }
-
 
 async function createBucket() {
     const bucketName = config.gcp.bucket.bucketName;
@@ -202,19 +140,16 @@ async function createBucket() {
     console.log(`Bucket ${bucket.name} created.`);
 }
 
-
 async function createCluster() {
     const projectId = config.gcp.projectId;
     const location = config.gcp.location;
 
-    // Create the cluster config
     const request = {
         projectId: projectId,
         region: location,
         cluster: config.gcp.cluster
     };
 
-    // Create the cluster
     const [operation] = await clusterClient.createCluster(request);
 
     console.log(`Waiting for response`);
@@ -223,15 +158,17 @@ async function createCluster() {
     console.log(`Cluster created successfully: ${response.clusterName}`);
 }
 
-
 async function uploadFile(options) {
-    const filename = options.filename;
+    const fileDir = options.fileDir;
+    const file = options.file;
     const bucketName = options.bucketName;
-    // Uploads a local file to the bucket
+    const gsDir = options.gsDir;
+
+    const filename = `${fileDir}/${file}`;
     await storage.bucket(bucketName).upload(filename, {
         // Support for HTTP requests made with `Accept-Encoding: gzip`
         gzip: false,
-
+        destination: `${gsDir}${file}`,
         metadata: {
             // Enable long-lived HTTP caching headers
             // Use only if the contents of the file will never change
@@ -243,35 +180,33 @@ async function uploadFile(options) {
     console.log(`${filename} uploaded to ${bucketName}.`);
 }
 
-
 async function uploadFiles() {
-    const inputFileNames = config.input.inputFileNames;
+    const inputFileNames = config.input.inputLinksFiles;
     const inputPath = config.input.inputPath;
     const bucketName = config.gcp.bucket.bucketName;
     const jarFileDir = config.gcp.job.jarFileDir;
     const jarFileName = config.gcp.job.jarFileName;
 
     var uploads = []
-    uploads.push(uploadFile({filename: `${jarFileDir}/${jarFileName}`, bucketName: bucketName}));
+    uploads.push(uploadFile({fileDir: jarFileDir, file: jarFileName, gsDir: '', bucketName: bucketName}));
 
     for (var i = 0; i < inputFileNames.length; i++) {
-        uploads.push(uploadFile({filename: `${inputPath}/${inputFileNames[i]}`, bucketName: bucketName}));
+        uploads.push(uploadFile(
+            {fileDir: inputPath, file: inputFileNames[i], gsDir: 'input/', bucketName: bucketName}));
     }
 
     await Promise.all(uploads);
     console.log(`All files are uploaded to ${bucketName}.`);
 }
 
-
-async function submitJob(options) {
-    const projectId = options.projectId;
-    const location = options.location;
-    const bucketName = options.bucketName;
-    const jarFileName = options.jarFileName;
-    const jarArgs = options.jarArgs;
-    const clusterName = options.clusterName;
-
-    const mainJarFileUri = `gs://${bucketName}/${jarFileName}`
+async function submitJob() {
+    const projectId = config.gcp.projectId;
+    const location = config.gcp.location;
+    const bucketName = config.gcp.bucket.bucketName;
+    const jarFileName = config.gcp.job.jarFileName;
+    const clusterName = config.gcp.cluster.clusterName;
+    const jarArgs = config.gcp.job.jarArgs;
+    const mainJarFileUri = `gs://${bucketName}/${jarFileName}`;
 
     const job = {
         projectId: projectId,
@@ -282,7 +217,10 @@ async function submitJob(options) {
             },
             sparkJob: {
                 mainJarFileUri: mainJarFileUri,
-                args: jarArgs
+                args: [
+                    `${jarArgs.inputDir}=gs://${bucketName}/input/`,
+                    `${jarArgs.outputDir}=gs://${bucketName}/output/`
+                ]
             }
         },
     };
@@ -292,7 +230,6 @@ async function submitJob(options) {
 
     console.log(`Submitted job "${jobId}".`);
 
-    // Terminal states for a job
     const terminalStates = new Set(['DONE', 'ERROR', 'CANCELLED']);
 
     // Create a timeout such that the job gets cancelled if not
@@ -336,44 +273,14 @@ async function submitJob(options) {
         )
         .download();
 
-    // Output a success message.
     console.log(
         `Job ${jobId} finished with state ${jobResp.status.state}:\n${output}`
     );
-}
 
-
-async function submitJobs() {
-    const projectId = config.gcp.projectId;
-    const location = config.gcp.location;
-    const bucketName = config.gcp.bucket.bucketName;
-    const jarFileName = config.gcp.job.jarFileName;
-    const inputFileNames = config.input.inputFileNames;
-    const clusterName = config.gcp.cluster.clusterName;
-    const jarArgs = config.gcp.job.jarArgs;
-
-    var jobs = [];
-    for (var i = 0; i < inputFileNames.length; i++) {
-        jobs.push(
-            submitJob({
-                projectId: projectId,
-                location: location,
-                bucketName: bucketName,
-                jarFileName: jarFileName,
-                clusterName: clusterName,
-                jarArgs: [
-                    `${jarArgs.inputDir}=gs://${bucketName}/`,
-                    `${jarArgs.inputFile}=${inputFileNames[i]}`,
-                    `${jarArgs.outputDir}=gs://${bucketName}/${inputFileNames[i]}`
-                ]
-            })
-        );
+    if (jobResp.status.state !== 'DONE') {
+        throw new Error(`Job ${jobId} finished with state ${jobResp.status.state}. See Console for details.`);
     }
-
-    await Promise.all(jobs);
-    console.log(`All jobs finished`);
 }
-
 
 async function getJobResultFiles(options) {
     const bucketName = options.bucketName;
@@ -382,16 +289,15 @@ async function getJobResultFiles(options) {
     const dataDir = options.dataDir;
     const outputDir = options.outputDir;
 
-
     const [files] = await storage.bucket(bucketName).getFiles({
         autoPaginate: false,
-        prefix: `${inputFileName}_${typeResult}/part-00000`
+        prefix: `output/${inputFileName}_${typeResult}/part-00000`
     });
 
     const filename = files[0].name;
 
-    const jsonFilename = `.${dataDir}/${typeResult}_${inputFileName}`
-    const saveFilename = `${outputDir}/${typeResult}_${inputFileName}`
+    const jsonFilename = `.${dataDir}/${typeResult}_${inputFileName}`;
+    const saveFilename = `${outputDir}/${typeResult}_${inputFileName}`;
     await storage.bucket(bucketName).file(filename).download({
         destination: saveFilename
     })
@@ -402,11 +308,10 @@ async function getJobResultFiles(options) {
     return jsonFilename;
 }
 
-
-async function donwloadResults() {
+async function downloadResults() {
     const bucketName = config.gcp.bucket.bucketName;
     const typeResults = config.output.typeResults;
-    const inputFileNames = config.input.inputFileNames;
+    const inputFileNames = config.input.inputLinksFiles;
     const publicDir = config.output.publicDir;
     const dataDir = config.output.dataDir;
 
@@ -416,22 +321,25 @@ async function donwloadResults() {
     var ranks_downloads = [];
     for (var i = 0; i < inputFileNames.length; i++) {
 
-        links_downloads.push(getJobResultFiles({
-            bucketName: bucketName,
-            typeResult: typeResults[0],
-            inputFileName: inputFileNames[i],
-            dataDir: dataDir,
-            outputDir: outputDir
-        }));
+        links_downloads.push(
+            getJobResultFiles({
+                bucketName: bucketName,
+                typeResult: typeResults[0],
+                inputFileName: inputFileNames[i],
+                dataDir: dataDir,
+                outputDir: outputDir
+            })
+        );
 
-        ranks_downloads.push(getJobResultFiles({
-            bucketName: bucketName,
-            typeResult: typeResults[1],
-            inputFileName: inputFileNames[i],
-            dataDir: dataDir,
-            outputDir: outputDir
-        }));
-
+        ranks_downloads.push(
+            getJobResultFiles({
+                bucketName: bucketName,
+                typeResult: typeResults[1],
+                inputFileName: inputFileNames[i],
+                dataDir: dataDir,
+                outputDir: outputDir
+            })
+        );
     }
 
     const links = await Promise.all(links_downloads);
@@ -441,8 +349,7 @@ async function donwloadResults() {
 
     const resultJson = {
         files: {
-            //TODO to change with local file
-            stations: 'https://dl.dropbox.com/s/w428ej85gj2mehc/stations.csv',
+            stations: `.${dataDir}/${config.output.nodesFile}`,
             ranks: ranks,
             links: links
         }
@@ -450,7 +357,6 @@ async function donwloadResults() {
 
     const jsonResultFile = `${outputDir}/result.json`;
 
-    const fs = require('fs');
     await fs.writeFile(jsonResultFile, JSON.stringify(resultJson), function (error) {
         if (error) {
             throw error
@@ -460,8 +366,7 @@ async function donwloadResults() {
     });
 }
 
-
-async function deleteAllResources(options) {
+async function deleteAllResources() {
     const projectId = config.gcp.projectId;
     const location = config.gcp.location;
     const clusterName = config.gcp.cluster.clusterName;
@@ -475,11 +380,9 @@ async function deleteAllResources(options) {
 
     const [clusterResp] = await clusterClient.getCluster(clusterReq);
 
-    // Delete the cluster once the job has terminated.
     const [deleteOperation] = await clusterClient.deleteCluster(clusterReq);
     await deleteOperation.promise();
 
-    // Output a success message
     console.log(`Cluster ${clusterName} successfully deleted.`);
 
     // By default, if a file cannot be deleted, this method will stop deleting
