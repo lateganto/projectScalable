@@ -6,7 +6,6 @@ function start(jsonUrl) {
         });
 }
 
-
 async function readData(jsonUrl) {
     spinnerText.textContent = 'Reading files location'
     console.log('Readin')
@@ -21,44 +20,22 @@ async function readData(jsonUrl) {
     ).then(processData)
 }
 
-/*readData = d3.json(jsonUrl).then(function (json) {
-    spinnerText.textContent = 'Reading files location'
-
-    return Promise.all(
-        [d3.csv(json.files.stations, typeStation),
-            collectData(json.files.ranks, typeRank),
-            collectData(json.files.links, typeLink)]
-    ).then(processData)
-        .catch(err => {
-            throw err
-        });
-
-}).catch(err => {
-    throw err
-});*/
-
 async function collectData(urls, typeData) {
     spinnerText.textContent = 'Collecting files'
-
     return Promise.all(urls.map(url => d3.csv(url, typeData)))
 }
 
 function processData(rawData) {
     spinnerText.textContent = 'Processing data'
 
-    console.log(rawData)
-    stations = {};
+    var stations = {};
     rawData[0].forEach(function (station) {
         stations[station.station] = station;
     });
 
-    console.log(stations)
+    var geoStations = rawData[1].map(ranks => processStations(stations, ranks))
+    var geoLinks = rawData[2].map(links => processLinks(stations, links))
 
-    geoStations = rawData[1].map(ranks => processStations(stations, ranks))
-    geoLinks = rawData[2].map(links => processLinks(stations, links))
-
-    console.log(geoStations)
-    console.log(geoLinks)
     return {
         'stations': geoStations,
         'links': geoLinks

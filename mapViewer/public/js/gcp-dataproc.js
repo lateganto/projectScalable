@@ -30,7 +30,7 @@ function downloadResults() {
 
 function deleteAll() {
     spinnerText.textContent = deleteAllMessage;
-    getAndWait('/dataproc/deleteAll', true, 5000, launchMapViewer, standardFail);
+    getAndWait('/dataproc/deleteAll', true, 5000, launchMapViewer, criticalFail);
 }
 
 function launchMapViewer() {
@@ -41,54 +41,28 @@ function getAndWait(url, flag, delay, successCallback, failCallback) {
     console.log('sending flag: ' + flag)
 
     $.get(url, {run: flag}, function (data) {
-        const recRun = JSON.parse(data.run);
         const recDone = JSON.parse(data.done);
         const recError = data.error;
 
-        console.log('just received flags: ' + recRun + ' - ' + recDone + ' : ' + recError)
-
         if (recError !== null) {
-
-            console.log('calling fail');
-            console.log(recError);
             failCallback(null, null, recError);
 
         } else if (recDone === false) {
-
             setTimeout(function () {
                 getAndWait(url, false, delay, successCallback, failCallback);  // Call the loop again after delay
             }, delay);
 
         } else {
-            console.log('calling success');
             successCallback()
         }
 
-        /*
-        if (recDone === false && recError === null) {
-            setTimeout(function () {
-                getAndWait(url, false, delay, successCallback, failCallback);  // Call the loop again after delay
-            }, delay);
-        } else if (recError !== null) {
-
-            console.log('calling fail');
-            console.log(recError);
-            throw recError;
-
-        } else {
-            console.log('calling success');
-            successCallback()
-        }
-
-         */
     }).fail(failCallback)
 
 }
 
-
 function standardFail(jqXHR, textStatus, errorThrown) {
     spinner.hidden = true;
-    spinnerText.textContent = `${errorThrown}  -  Deleting All resources in 10 seconds.`;
+    spinnerText.textContent = `${errorThrown}\nDeleting All resources in 10 seconds.`;
 
     setTimeout(function () {
         spinner.hidden = false;
@@ -99,7 +73,7 @@ function standardFail(jqXHR, textStatus, errorThrown) {
 
 function criticalFail(jqXHR, textStatus, errorThrown) {
     spinner.remove();
-    spinnerText.textContent = `${errorThrown}  -  ${criticalFailMessage}`;
+    spinnerText.textContent = `${errorThrown}\n${criticalFailMessage}`;
 }
 
 function onTaskFailed() {

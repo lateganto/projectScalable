@@ -10,8 +10,8 @@ const spinner = document.getElementById('spinner');
 const gcpButton = document.getElementById('gcp-button');
 const demoButton = document.getElementById('demo-button');
 
-const demo = "./data/result-demo.json"
-const gcp = "./data/result.json"
+const demo = "./data/result-demo.json";
+const gcp = "./data/result.json";
 
 const monthLiteral = [
     'January',
@@ -41,11 +41,10 @@ const linkWidths = [[0.1, 1], [1, 5]];
 // Messages to print
 const initMessage = 'Initializing Google Cloud Clients';
 const createBucketMessage = 'Creating Bucket';
-const createClusterMessage = 'Creating Cluster - It may take a lot ...';
+const createClusterMessage = 'Creating Cluster - It may take some time';
 const uploadFilesMessage = 'Uploading files to Bucket';
-const submitJobsMessage = 'Submitting jobs to Dataproc cluster';
+const submitJobsMessage = 'Submitting job to Cluster';
 const downloadResultsMessage = 'Downloading results';
 const deleteAllMessage = 'Deleting Cluster and Bucket';
 const standardFailMessage = 'Task failed. Check the Errors and try again.';
-const criticalFailMessage = 'TASK FAILED: UNABLE TO DELETE THE ALLOCATED RESOURCES. ' +
-    'GO ON YOUR GOOGLE CLOUD CONSOLE AND CHECK DATAPROC RESOURCES.';
+const criticalFailMessage = 'TASK FAILED: unable to delete the allocated resources on GCP Dataproc.';
