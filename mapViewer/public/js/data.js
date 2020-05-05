@@ -1,4 +1,27 @@
-readData = d3.json(jsonUrl).then(function (json) {
+function start(jsonUrl) {
+    console.log('start')
+    readData(jsonUrl).then(drawData)
+        .catch(err =>  {
+            spinnerText.textContent = err.toString()
+        });
+}
+
+
+async function readData(jsonUrl) {
+    spinnerText.textContent = 'Reading files location'
+    console.log('Readin')
+
+    const json = await d3.json(jsonUrl);
+    console.log(json)
+
+    return Promise.all(
+        [d3.csv(json.files.stations, typeStation),
+            collectData(json.files.ranks, typeRank),
+            collectData(json.files.links, typeLink)]
+    ).then(processData)
+}
+
+/*readData = d3.json(jsonUrl).then(function (json) {
     spinnerText.textContent = 'Reading files location'
 
     return Promise.all(
@@ -12,7 +35,7 @@ readData = d3.json(jsonUrl).then(function (json) {
 
 }).catch(err => {
     throw err
-});
+});*/
 
 async function collectData(urls, typeData) {
     spinnerText.textContent = 'Collecting files'
