@@ -2,7 +2,7 @@ package pagerank
 
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
-import Utils._
+import pagerank.Utils._
 
 final case class PageRankGraph(numVertices: Id, vertices: RichVertexPairRDD, edges: OutEdgePairRDD) {
 
@@ -32,7 +32,6 @@ final case class PageRankGraph(numVertices: Id, vertices: RichVertexPairRDD, edg
    def saveNodes(path: String, spark: SparkSession, local: Boolean): Unit = {
 
       val start_time = System.nanoTime()
-
       log_print("Saving links in " + path, Thread.currentThread().getName)
 
       if (local) deleteFolderIfExists(path)
@@ -55,16 +54,5 @@ final case class PageRankGraph(numVertices: Id, vertices: RichVertexPairRDD, edg
          Thread.currentThread().getName)
 
    }
-
-   /*def printOutAll = {
-      println("vertices are:")
-      vertices.take(20).foreach(println)
-      //      println(s"${vertices.collect().mkString(",")}")
-
-      println("\nedges are:")
-      //      edges.collect().foreach(println)
-      //      println(s"${edges.collect().mkString(",")}")
-   }*/
-
 
 }

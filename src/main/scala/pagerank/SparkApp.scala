@@ -2,29 +2,24 @@ package pagerank
 
 import org.apache.spark.sql.SparkSession
 import org.kohsuke.args4j.{CmdLineException, CmdLineParser, Option}
-import Utils.setupLogging
+import pagerank.Utils.setupLogging
 
 trait SparkApp {
 
    class Options {
-      @Option(name = "--input_dir", usage = "Input directory path containing CSV information about the stations", required = true)
+      @Option(name = "--inputDir", usage = "Input directory path containing CSV information", required = true)
       var input_dir: String = _
 
-      @Option(name = "--input_file", usage = "Input path containing CSV information about the stations\n" +
-         "(Do not use in local mode!)")
-      var input_file: String = ""
+      @Option(name = "--outputDir", usage = "Output directory path for the ranks and links CSV files", required = true)
+      var output_dir: String = _
 
-      @Option(name = "--output_dir", usage = "Output directory path for the ranks and links CSV files. \n" +
-         "(default=same folder of executable)")
-      var output_dir: String = "./"
-
-      @Option(name = "--numIterations", usage = "Number of iterations to use for the PageRank algorithm \n(default=10)")
+      @Option(name = "--numIterations", usage = "Number of iterations to use for the PageRank algorithm (default=10)")
       var numIterations: Int = 10
 
-      @Option(name = "--dampingFactor", usage = "Damping parameter for PageRank \n(default=0.85)")
+      @Option(name = "--dampingFactor", usage = "Damping parameter for PageRank (default=0.85)")
       var dampingFactor: Double = 0.85
 
-      @Option(name = "--local", usage = "If you want to run Spark in local")
+      @Option(name = "--local", usage = "If you want to run Spark in local (default=false)")
       var local: Boolean = false
    }
 

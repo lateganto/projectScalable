@@ -2,6 +2,8 @@ package pagerank
 
 import java.io.File
 
+import org.apache.hadoop.fs.Path
+import org.apache.spark.SparkContext
 import org.apache.spark.sql.SparkSession
 
 import scala.reflect.io.Directory
@@ -11,21 +13,24 @@ object Utils {
    /*
       Returns a list of the files in a specified folder
     */
-   def getListOfFiles(dir: String): List[File] = {
-      val d = new File(dir)
-      if (d.exists && d.isDirectory) {
-         d.listFiles.filter(_.isFile).toList
-      } else {
-         List[File]()
-      }
+   def getListOfFiles(dir: String, sc: SparkContext): List[String] = {
+
+      val hdFileSystem = new Path(dir).getFileSystem(sc.hadoopConfiguration)
+
+      hdFileSystem
+         .listStatus(new Path(dir))
+         .flatMap { status =>
+            if (status.isFile)
+               List(status.getPath.getName)
+            else
+               List()
+         }
+         .toList
+         .sorted
    }
 
    def log_print(msg: String, thread_name: String): Unit = {
       println("[" + thread_name + "] --- " + msg)
-   }
-
-   def log_print(msg: String): Unit = {
-      println(msg)
    }
 
    def deleteFolderIfExists(path: String): Unit = {
@@ -40,9 +45,7 @@ object Utils {
       spark.sparkContext.setLogLevel("WARN")
 
    /*
-
-
-      Class that helps saving an RDD to a CSV format file without unnecessary other files that Spark produces
+   //Class that helps saving an RDD to a CSV format file without unnecessary other files that Spark produces
 
    implicit class DFExtensions(val df: DataFrame) extends AnyVal {
 
