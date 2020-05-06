@@ -29,6 +29,11 @@
         "softwareConfig": {
           "imageVersion":  "1.5-debian10"
         },
+        "lifecycleConfig": {
+          "idleDeleteTtl": {
+            "seconds": "600"
+          }
+        },
         "endpointConfig": {
           "httpPorts": {},
           "enableHttpPortAccess": true

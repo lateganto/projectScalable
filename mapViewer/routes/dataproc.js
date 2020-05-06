@@ -372,6 +372,12 @@ async function deleteAllResources() {
     const clusterName = config.gcp.cluster.clusterName;
     const bucketName = config.gcp.bucket.bucketName;
 
+    // By default, if a file cannot be deleted, this method will stop deleting
+    // files from your bucket. You can override this setting with `force: true
+    await storage.bucket(bucketName).deleteFiles({force: true});
+    await storage.bucket(bucketName).delete();
+    console.log(`Bucket ${bucketName} successfully deleted.`);
+
     const clusterReq = {
         projectId: projectId,
         region: location,
@@ -382,14 +388,7 @@ async function deleteAllResources() {
 
     const [deleteOperation] = await clusterClient.deleteCluster(clusterReq);
     await deleteOperation.promise();
-
     console.log(`Cluster ${clusterName} successfully deleted.`);
-
-    // By default, if a file cannot be deleted, this method will stop deleting
-    // files from your bucket. You can override this setting with `force: true
-    await storage.bucket(bucketName).deleteFiles({force: true});
-    await storage.bucket(bucketName).delete();
-    console.log(`Bucket ${bucketName} successfully deleted.`);
 }
 
 module.exports = router;

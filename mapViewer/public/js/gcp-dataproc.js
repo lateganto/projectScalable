@@ -1,14 +1,6 @@
 function init() {
     spinnerText.textContent = initMessage;
-    $.ajax({
-        url: gcp,
-        success: function(data){
-            launchMapViewer();
-        },
-        error: function(data){
-            initClients();
-        },
-    });
+    $.get(gcp, launchMapViewer).fail(initClients);
 }
 
 function initClients() {
