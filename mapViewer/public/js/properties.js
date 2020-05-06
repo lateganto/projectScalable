@@ -29,13 +29,13 @@ const monthLiteral = [
 ];
 
 // Stations color palette: min, max, hover
-const circleColors = ['#FCA107', '#7F3121', '#d0340d'];
+const circleColors = ['#A4DCEC', '#000031', '#002d50'];
 const circleOpacity = 0.95;
-const circleStrokeColor = '#472700';
-const circleStrokeWidth = 0.8;
+const circleStrokeColor = '#10212D';
+const circleStrokeWidth = 0.7;
 // Links color palette: none, in, out
-const linkColors = ['#ead5d0', '#ff5a5a', '#ffda1f'];
-const linkOpacity =  0.75;
+const linkColors = ['#D4D6D7', '#DA5656', '#FFE66D'];
+const linkOpacity =  0.85;
 // Stations radius domain/range values: min domain, max domain, min range, max range
 const circleRadius = [[0.1, 1], [3, 15]];
 const rankFactor = 100;
