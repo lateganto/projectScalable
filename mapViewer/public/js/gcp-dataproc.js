@@ -1,5 +1,18 @@
 function init() {
     spinnerText.textContent = initMessage;
+    $.ajax({
+        url: gcp,
+        success: function(data){
+            launchMapViewer();
+        },
+        error: function(data){
+            initClients();
+        },
+    });
+}
+
+function initClients() {
+    spinnerText.textContent = initClientsMessage;
     getAndWait('/dataproc', true, 1000, createBucket, standardFail);
 }
 
@@ -38,8 +51,6 @@ function launchMapViewer() {
 }
 
 function getAndWait(url, flag, delay, successCallback, failCallback) {
-    console.log('sending flag: ' + flag)
-
     $.get(url, {run: flag}, function (data) {
         const recDone = JSON.parse(data.done);
         const recError = data.error;
@@ -53,11 +64,10 @@ function getAndWait(url, flag, delay, successCallback, failCallback) {
             }, delay);
 
         } else {
-            successCallback()
+            successCallback();
         }
 
-    }).fail(failCallback)
-
+    }).fail(failCallback);
 }
 
 function standardFail(jqXHR, textStatus, errorThrown) {

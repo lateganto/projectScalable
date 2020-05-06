@@ -31,10 +31,10 @@ const monthLiteral = [
 // Stations color palette: min, max, hover
 const circleColors = ['#FCA107', '#7F3121', '#d0340d'];
 const circleOpacity = 0.95;
-const circleStrokeColor = '#fff';
-const circleStrokeWidth = 1;
+const circleStrokeColor = '#472700';
+const circleStrokeWidth = 0.8;
 // Links color palette: none, in, out
-const linkColors = ['#6aa5fc', '#ff5a5a', '#ffda1f'];
+const linkColors = ['#d0c6a4', '#ff5a5a', '#ffda1f'];
 const linkOpacity =  0.75;
 // Stations radius domain/range values: min domain, max domain, min range, max range
 const circleRadius = [[0.1, 1], [3, 15]];
@@ -49,7 +49,8 @@ const processDataMessage = 'Processing data';
 const drawMapDataMessage = 'Drawing Map';
 
 // Messages to print - gcp
-const initMessage = 'Initializing Google Cloud Clients';
+const initMessage = 'Checking files';
+const initClientsMessage = 'Initializing Google Cloud Clients';
 const createBucketMessage = 'Creating Bucket';
 const createClusterMessage = 'Creating Cluster - It may take some time';
 const uploadFilesMessage = 'Uploading files to Bucket';
