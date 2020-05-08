@@ -2,7 +2,7 @@ function drawData(data) {
     spinnerText.textContent = drawMapDataMessage;
 
     const map = getMap();
-    const layers = ['links', 'stations'];
+    const layers = mapLayers;
 
     loadMapLayers(map, layers, data);
     setMapInteraction(layers);
@@ -14,13 +14,12 @@ function drawData(data) {
 }
 
 function getMap() {
-    mapboxgl.accessToken = 'pk.eyJ1Ijoic2Fsdm92IiwiYSI6ImNrOTlyYWs4aDA2czMzbXJ3NzVveWI4dmEifQ.v51k6bgzhO1LBwuO9jZKEg';
+    mapboxgl.accessToken = mapToken;
     map = new mapboxgl.Map({
         container: 'map',
-        style: 'mapbox://styles/salvov/ck9ftkh9p3sra1ilg1ddppb7g',
-        //style: 'mapbox://styles/mapbox/light-v10',
-        center: [-77.0369, 38.9072],
-        zoom: 11.5
+        style: mapStyle,
+        center: mapCenter,
+        zoom: mapZoom
     });
 
     // Add zoom and rotation controls to the map.
@@ -44,7 +43,7 @@ function loadMapLayers(map, layerIDs, data) {
             stationsLayerId, {
                 type: 'geojson',
                 data: data.stations[0],
-                generateId: true     // This ensures that all features have unique IDs
+                generateId: true
             });
 
         map.addLayer({

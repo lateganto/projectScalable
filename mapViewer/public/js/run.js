@@ -16,5 +16,7 @@ demoButton.addEventListener('click', function () {
     demoButton.remove();
     gcpButton.remove();
 
+    mapZoom = 12;
+    rankFactor = 25;
     start(demo);
 });
