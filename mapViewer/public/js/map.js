@@ -1,16 +1,16 @@
 function drawData(data) {
-    spinnerText.textContent = 'Drawing Map'
+    spinnerText.textContent = drawMapDataMessage;
 
-    map = getMap()
-    layers = ['links', 'stations']
+    const map = getMap();
+    const layers = ['links', 'stations'];
 
-    loadMapLayers(map, layers, data)
-    setMapInteraction(layers)
+    loadMapLayers(map, layers, data);
+    setMapInteraction(layers);
 
-    setToggleableLayer(map, layers[0])
-    setMonthSlider(map, layers, data)
+    setToggleableLayer(map, layers[0]);
+    setMonthSlider(map, layers, data);
 
-    spinnerBackground.remove()
+    spinnerBackground.remove();
 }
 
 function getMap() {
@@ -19,8 +19,8 @@ function getMap() {
         container: 'map',
         style: 'mapbox://styles/salvov/ck9ftkh9p3sra1ilg1ddppb7g',
         //style: 'mapbox://styles/mapbox/light-v10',
-        center: [-77.0369, 38.9072],    // starting position [lon, lat]
-        zoom: 11.5                       // starting zoom
+        center: [-77.0369, 38.9072],
+        zoom: 11.5
     });
 
     // Add zoom and rotation controls to the map.
@@ -30,8 +30,8 @@ function getMap() {
 }
 
 function loadMapLayers(map, layerIDs, data) {
-    linksLayerId = layerIDs[0]
-    stationsLayerId = layerIDs[1]
+    var linksLayerId = layerIDs[0];
+    var stationsLayerId = layerIDs[1];
 
     map.on('load', function () {
         map.addSource(
@@ -64,7 +64,7 @@ function loadMapLayers(map, layerIDs, data) {
                         linkWidths[0][1], linkWidths[1][1]
                     ],
                 'line-color': linkColors[0],
-                'line-opacity': 0.75
+                'line-opacity': linkOpacity
             }
         });
 
@@ -96,9 +96,9 @@ function loadMapLayers(map, layerIDs, data) {
                             circleRadius[0][1], circleRadius[1][1]
                         ]
                     ],
-                'circle-stroke-color': 'white',
-                'circle-stroke-width': 1,
-                'circle-opacity': 0.95
+                'circle-stroke-color': circleStrokeColor,
+                'circle-stroke-width': circleStrokeWidth,
+                'circle-opacity': circleOpacity
             }
         });
 
@@ -106,9 +106,9 @@ function loadMapLayers(map, layerIDs, data) {
 }
 
 function setMapInteraction(layers) {
-    stationId = null;
-    inLinksLayer = null;
-    outLinksLayer = null;
+    var stationId = null;
+    var inLinksLayer = null;
+    var outLinksLayer = null;
 
     map.on('mouseenter', layers[1], function (e) {
         map.getCanvas().style.cursor = 'pointer';
@@ -131,11 +131,11 @@ function setMapInteraction(layers) {
             id: stationId,
         }, {hover: true});
 
-        outFilter = ['==', ['number', ['get', 'source_id']], e.features[0].properties.station]
-        inFilter = ['==', ['number', ['get', 'target_id']], e.features[0].properties.station]
+        var outFilter = ['==', ['number', ['get', 'source_id']], e.features[0].properties.station];
+        var inFilter = ['==', ['number', ['get', 'target_id']], e.features[0].properties.station];
 
-        outLinksLayer = addStationLinksLayer(map, layers, 'outStLinks', outFilter, linkColors[2])
-        inLinksLayer = addStationLinksLayer(map, layers, 'inStLinks', inFilter, linkColors[1])
+        outLinksLayer = addStationLinksLayer(map, layers, 'outStLinks', outFilter, linkColors[2]);
+        inLinksLayer = addStationLinksLayer(map, layers, 'inStLinks', inFilter, linkColors[1]);
     });
 
     map.on('mouseleave', layers[1], function () {
@@ -152,10 +152,10 @@ function setMapInteraction(layers) {
 
         stationId = null;
         if (inLinksLayer) {
-            map.removeLayer(inLinksLayer)
+            map.removeLayer(inLinksLayer);
         }
         if (outLinksLayer) {
-            map.removeLayer(outLinksLayer)
+            map.removeLayer(outLinksLayer);
         }
 
         inLinksLayer = null;
@@ -188,7 +188,7 @@ function addStationLinksLayer(map, baseLayers, layerId, filter, color) {
                 linkWidths[0][1], linkWidths[1][1]
             ],
             'line-color': color,
-            'line-opacity': 0.75
+            'line-opacity': linkOpacity
         }, filter: filter
     }, baseLayers[1]);
 
@@ -197,7 +197,7 @@ function addStationLinksLayer(map, baseLayers, layerId, filter, color) {
 
 function setToggleableLayer(map, layerId) {
     linksLayerToggle.addEventListener('input', function (e) {
-        visibility = map.getLayoutProperty(layerId, 'visibility');
+        var visibility = map.getLayoutProperty(layerId, 'visibility');
 
         // toggle layer visibility by changing the layout object's visibility property
         if (visibility === 'visible') {
@@ -212,8 +212,8 @@ function setToggleableLayer(map, layerId) {
 
 function setMonthSlider(map, layers, data) {
     monthSlider.addEventListener('input', function (e) {
-        month = parseInt(e.target.value);
-        monthName = monthLiteral[month]
+        var month = parseInt(e.target.value);
+        var monthName = monthLiteral[month];
 
         map.getSource(layers[0]).setData(data.links[month]);
         map.getSource(layers[1]).setData(data.stations[month]);
