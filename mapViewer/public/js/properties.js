@@ -34,8 +34,8 @@ const monthLiteral = [
 const mapToken = 'pk.eyJ1Ijoic2Fsdm92IiwiYSI6ImNrOTlyYWs4aDA2czMzbXJ3NzVveWI4dmEifQ.v51k6bgzhO1LBwuO9jZKEg';
 //const mapStyle = 'mapbox://styles/mapbox/light-v10';
 const mapStyle = 'mapbox://styles/salvov/ck9ftkh9p3sra1ilg1ddppb7g';
-const mapCenter = [-77.0369, 38.9072];
-const mapZoom = 11.5;
+const mapCenter = [-77.05, 38.90];
+var mapZoom = 11.5;
 const mapLayers = ['links', 'stations'];
 
 // Stations color palette: min, max, hover
@@ -51,11 +51,12 @@ inColorLegend.style.background = linkColors[1];
 outColorLegend.style.background = linkColors[2];
 
 // Stations radius domain/range values: min domain, max domain, min range, max range
-const circleRadius = [[0.1, 1], [3, 15]];
-const rankFactor = 100;
+const circleRadius = [[0.1, 1.0], [3, 15]];
+// The scale factor applied to correct small rank values. In case of Demo, it is set to 25 in run.js
+var rankFactor = 100;
 
 // Links width domain/range values: min domain, max domain, min range, max range
-const linkWidths = [[0.1, 1], [1, 5]];
+const linkWidths = [[1, 50], [1, 5]];
 
 // Messages to print - data
 const readDataMessage = 'Reading files location';
