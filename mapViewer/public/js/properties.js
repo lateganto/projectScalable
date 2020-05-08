@@ -9,6 +9,8 @@ const spinnerText = document.getElementById('spinner-text');
 const spinner = document.getElementById('spinner');
 const gcpButton = document.getElementById('gcp-button');
 const demoButton = document.getElementById('demo-button');
+const inColorLegend = document.getElementById('in-color');
+const outColorLegend = document.getElementById('out-color');
 
 const demo = "./data/result-demo.json";
 const gcp = "./data/result.json";
@@ -28,17 +30,30 @@ const monthLiteral = [
     'December'
 ];
 
+// map properties
+const mapToken = 'pk.eyJ1Ijoic2Fsdm92IiwiYSI6ImNrOTlyYWs4aDA2czMzbXJ3NzVveWI4dmEifQ.v51k6bgzhO1LBwuO9jZKEg';
+//const mapStyle = 'mapbox://styles/mapbox/light-v10';
+const mapStyle = 'mapbox://styles/salvov/ck9ftkh9p3sra1ilg1ddppb7g';
+const mapCenter = [-77.0369, 38.9072];
+const mapZoom = 11.5;
+const mapLayers = ['links', 'stations'];
+
 // Stations color palette: min, max, hover
 const circleColors = ['#A4DCEC', '#000031', '#002d50'];
 const circleOpacity = 0.95;
 const circleStrokeColor = '#10212D';
 const circleStrokeWidth = 0.7;
+
 // Links color palette: none, in, out
-const linkColors = ['#D4D6D7', '#DA5656', '#FFE66D'];
+const linkColors = ['#D4D6D7', '#dc3535', '#ffd90e'];
 const linkOpacity =  0.85;
+inColorLegend.style.background = linkColors[1];
+outColorLegend.style.background = linkColors[2];
+
 // Stations radius domain/range values: min domain, max domain, min range, max range
 const circleRadius = [[0.1, 1], [3, 15]];
 const rankFactor = 100;
+
 // Links width domain/range values: min domain, max domain, min range, max range
 const linkWidths = [[0.1, 1], [1, 5]];
 

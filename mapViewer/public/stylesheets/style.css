@@ -86,14 +86,6 @@ h2 {
     vertical-align: middle;
 }
 
-.map-overlay dl dt.in-color {
-    background: #DA5656;
-}
-
-.map-overlay dl dt.out-color {
-    background: #FFE66D;
-}
-
 .map-overlay .switch {
     position: relative;
     display: inline-block;
