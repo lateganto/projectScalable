@@ -12,17 +12,19 @@ package object pagerank {
    type OutEdgePairRDD = RDD[OutEdgePair]
    type RichVertexPairRDD = RDD[RichVertexPair]
 
-
+   type SimpleEdgeRDD = RDD[SimpleEdge]
    type EdgeRDD = RDD[Edge]
    type VertexRDD = RDD[Vertex]
 
    final case class Vertex(id: Id, value: Value)
 
-   final case class Edge(srcId: Id, dstId: Id, weight: Value) {
-      def toOutEdgePair: OutEdgePair = (srcId, OutEdge(dstId, weight))
+   final case class SimpleEdge(srcId: Id, dstId: Id, weight: Value)
+
+   final case class Edge(srcId: Id, dstId: Id, weight: Value, normalizedWeight: Value) {
+      def toOutEdgePair: OutEdgePair = (srcId, OutEdge(dstId, weight, normalizedWeight))
    }
 
-   final case class OutEdge(dstId: Id, weight: Value)
+   final case class OutEdge(dstId: Id, weight: Value, normalizedWeight: Value)
 
    final case class DataVertex(value: Value, isDangling: Boolean) {
       /**

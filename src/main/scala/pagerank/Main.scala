@@ -5,6 +5,8 @@ import pagerank.Utils.{getListOfFiles, log_print}
 
 object Main extends SparkApp {
 
+   val timeout = 5000
+
    override def run(options: Options, spark: SparkSession): Unit = {
 
       val sc = spark.sparkContext
@@ -44,7 +46,6 @@ object Main extends SparkApp {
    def waitUntilAliveThreads(threads_list: List[Thread]): Unit = {
 
       var some_alive = true
-
       while (some_alive) {
          some_alive = false
          for (thread <- threads_list) {
@@ -54,7 +55,7 @@ object Main extends SparkApp {
          }
 
          if (some_alive)
-            Thread.sleep(5000)
+            Thread.sleep(timeout)
       }
    }
 

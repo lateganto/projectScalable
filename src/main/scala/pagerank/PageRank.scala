@@ -1,7 +1,7 @@
 package pagerank
 
 import org.apache.spark.rdd.RDD
-import Utils.log_print
+import pagerank.Utils.log_print
 
 object PageRank {
 
@@ -35,12 +35,11 @@ object PageRank {
          val incomingWeightedSum = graph.edges
             .join(updatedVertices)
             .map { case (_, (edge, vertexData)) =>
-               (edge.dstId, vertexData.value * edge.weight)
+               (edge.dstId, vertexData.value * edge.normalizedWeight)
             }
             .reduceByKey(_ + _)
 
          updatedVertices = updateVertices(
-            graph.edges,
             updatedVertices,
             graph.numVertices,
             incomingWeightedSum,
@@ -57,8 +56,7 @@ object PageRank {
 
    }
 
-   def updateVertices(edges: OutEdgePairRDD,
-                      vertices: RichVertexPairRDD,
+   def updateVertices(vertices: RichVertexPairRDD,
                       numVertices: Long,
                       incomingWeightedSum: RDD[(Id, Double)],
                       danglesum: Double,

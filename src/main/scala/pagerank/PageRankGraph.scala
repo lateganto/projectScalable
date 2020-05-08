@@ -13,11 +13,11 @@ final case class PageRankGraph(numVertices: Id, vertices: RichVertexPairRDD, edg
 
       if (local) deleteFolderIfExists(path)
 
-      val edgRDD = edges.map {
-         case (src, OutEdge(dst, weight)) => (src, dst, weight)
+      val edgeRDD = edges.map {
+         case (src, OutEdge(dst, weight, _)) => (src, dst, weight)
       }
 
-      val dfWithSchema = spark.createDataFrame(edgRDD).toDF("source", "target", "weight")
+      val dfWithSchema = spark.createDataFrame(edgeRDD).toDF("source", "target", "weight")
 
       dfWithSchema.coalesce(1)
          .write
@@ -50,7 +50,7 @@ final case class PageRankGraph(numVertices: Id, vertices: RichVertexPairRDD, edg
          .option("header", "true")
          .save(path)
 
-      log_print(s"SAVING RANKS DONE! > Elapsed time: ${(System.nanoTime - start_time)/1000000000f}s" ,
+      log_print(s"SAVING RANKS DONE! > Elapsed time: ${(System.nanoTime - start_time) / 1000000000f}s",
          Thread.currentThread().getName)
 
    }

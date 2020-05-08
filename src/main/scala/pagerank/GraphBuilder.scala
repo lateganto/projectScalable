@@ -2,7 +2,7 @@ package pagerank
 
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
-import Utils.log_print
+import pagerank.Utils.log_print
 
 
 object GraphBuilder {
@@ -30,33 +30,37 @@ object GraphBuilder {
          .filter(row => row._1._1 != row._1._2) // deletes self link
          .reduceByKey((x, y) => x + y)
          .map {
-            case ((src, dst), weigth) => Edge(src, dst, weigth)
+            case ((src, dst), weigth) => SimpleEdge(src, dst, weigth)
          }
 
       val edges = normalizeOutEdgeWeights(weightedEdges)
 
       val output = fromEdgesToGraph(edges)
 
-      log_print(s"GRAPH BUILT! > Elapsed time: ${(System.nanoTime - start_time)/1000000000f}s", current_tread)
+      log_print(s"GRAPH BUILT! > Elapsed time: ${(System.nanoTime - start_time) / 1000000000f}s", current_tread)
       log_print("Nodes: " + output.numVertices + ", Links: " + output.edges.count(), Thread.currentThread().getName)
 
       output
    }
 
    /*
-    * Normalizes the out edges in a way that the sum of the weights for each node is 1
+    * Normalizes the out edges in a way that the sum of the weights for each node is 1.
+    * Return an RDD with edges and their normal and normalized weight values
     */
-   def normalizeOutEdgeWeights(edges: EdgeRDD): EdgeRDD = {
+   def normalizeOutEdgeWeights(edges: SimpleEdgeRDD): EdgeRDD = {
       val sums = edges
          .map {
             edge => (edge.srcId, edge.weight)
          }.reduceByKey(_ + _)
 
       edges
-         .map(_.toOutEdgePair)
+         .map { case SimpleEdge(srcId, dstId, weight) =>
+            (srcId, (dstId, weight))
+         }
+         //(_.toOutSimpleEdgePair)
          .join(sums)
          .map { case (srcId, (outEdge, weightSum)) =>
-            Edge(srcId, outEdge.dstId, outEdge.weight / weightSum)
+            Edge(srcId, outEdge._1, outEdge._2, outEdge._2 / weightSum)
          }.persist()
    }
 
