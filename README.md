@@ -17,31 +17,36 @@
     * [Using the gcloud console](#using-the-gcloud-console)
 
 ## Project Description
-The main purpose of this project is to compute the Weighted PageRank for the bike stations of the 
-[CapitalBikeShare][capital_bike] network in Washington DC developing a scala-spark app. 
-The PageRank of the stations is computed 
-considering the [tripdata of the year 2019][capital_bike_data]. The PageRank algorithm for weighted edges is 
-a modified version taken from [NetworkX implementation][networkx_pagerank]. The Computation is done on the Google Cloud
-Platform using the [Dataproc][product-docs] and Storage. A client-server webapp is also developed to run the computation
-on the GCP using the [Nodejs APIs][client-docs] and to retrieve and show the result on an interactive map using 
-the [MapBox GL js APIs][mapbox-api].
+The main purpose of this project is to compute the Weighted PageRank for the bike stations of the
+[CapitalBikeShare][capital_bike] network in Washington DC developing a scala-spark app.  
+The PageRank of the stations is computed considering the [tripdata of the year 2019][capital_bike_data].  
+The PageRank algorithm for weighted edges is a modified version taken from [NetworkX implementation][networkx_pagerank].  
+The Computation is done on the Google Cloud Platform using the [Dataproc][product-docs] and Storage solutions.  
+A client-server webapp is also developed to run and control the computation on the GCP using the 
+[Nodejs APIs][client-docs] and to show the result on an interactive map using the [MapBox GL js APIs][mapbox-api].
 
 ### Dataset
-The [dataset][capital-bike-data-source] is divided in 12 files, once for each month of the year 2019. Each file contains a single tripdata information, composed
-by `Start station number`, `End station number`, `Start date`, `End date` and other properties that we have not take in account.
-The files are stored in folder `./data/input/`.
-Taking a trip from a `source` to a `destination`, in the original file there could be more than one single occurance of 
-the sma couple `source-destionation`. So, during the built of the Graph, firstly, it is counted the number of occurence
-of each couple representing the weight of that edge. After, following the formula for the Weighted Pagerank, for each
-station, the weight of the outgoing edges is normalized such that the sum of outgoing edges is 1.
+The [dataset][capital-bike-data-source] is divided in 12 files, one for each month of the year 2019.  
+Each file contains a single trip information, composed by a `Start station number`, an `End station number`,
+a `Start date`, an `End date` and other properties that we have not taken in account.  
+The files are stored in folder `./data/input/`.  
+
+A trip from a `source` to a `destination` could exist more than one time. During the building of the Graph, 
+firstly, it is counted the number time the same couple `source-destionation` appear as the weight of that edge. 
+After, following the formula for the [weighted Pagerank][networkx_pagerank], for each station, the weight of the 
+outgoing edges is normalized such that the sum of outgoing edges is 1.
+
+For each file there are up to 350-400 thousands trips. The number of stations in the graph is 581.
 
 ### Project Structure
-The project consists of a Nodejs webapp and a Scala-Spark app. The Scala-Spark app is the core of the computation: it is
-developed for compute the PageRank of the stations in the weighted graph. The Nodejs webapp is a client-server app. The client
-part runs the request for the computation and shows the results of the computation on an interactive map. The server side 
-uses the Google Cloud Clients Apis for uploading the file, running the Scala-Spark app as a Job in a Dataproc cluster and for 
-downloading the results.
-Below is shown the project files and folders structure, it is useful to know for further steps.
+The project consists of a Node.js webapp and a Scala-Spark app.  
+The Scala-Spark app is the core of the computation: it is developed for compute the PageRank of the stations in 
+the weighted graph.  
+The Node.js webapp is a client-server app. The client side runs the requests for the computation and shows the results
+ of on an interactive map. The server side uses the Google Cloud Node.js APIs for uploading the files, 
+ running the Scala-Spark app as a Job in a Dataproc cluster and for downloading the results. 
+
+Below it is shown the project files and folders structure. It is useful to know for the further steps.
 
 ```
 projectScalable
@@ -74,7 +79,6 @@ projectScalable
 |       └── package-lock.json
 |
 ├── project
-|   ├── assembly.sbt
 |   └── plugins.sbt 
 |
 ├── src/main/scala
@@ -104,7 +108,7 @@ projectScalable
 
 ### Explaining config.json structure
 The file `config.json` is located in the folder `projectScalable/mapViewer`. This file contains the configuration
-values for running the app. The structure of the file is shown below.
+values for running the app. The structure of the configuration is shown below.
 ```
 {
     keyFileName: string
@@ -132,29 +136,28 @@ values for running the app. The structure of the file is shown below.
     }
 }
 ```
-The `keyFileName` is the path where the key for accessing the Google Cloud APIs is stored on your local machine. Set this 
-value before to continue. The `gcp` values are used for setting the bucket, cluster, and job properties on GCP.
+The `keyFileName` is the path where the [key for accessing the Google Cloud APIs](#before-you-begin) is stored 
+on your local workstation. **Set this value before to continue**.  
+The `gcp` values are used for setting the bucket, cluster and job properties on GCP.  
 Set the value `projectId` as that your key is associated. Then, set the values
- `location` and `bucketName` and `clusterName` as you like, or leave it as they are. Also, you can change the configuration
- of cluster. As default, the cluster is composed of a master and 3 workers with 2 standard cpus each one.
+ `location`, `bucketName` and `clusterName` as you like, or leave it as they are.   
+ You could change the configuration of the cluster. As default, the cluster is composed of a master and
+  3 workers with 2 standard cpus each one.
 
 ### Creating the jar executable
 To create the fat JAR file (i.e. a jar with all the dependencies the program requires) 
-we used `sbt-assembly`. So start your **sbt console**, run the command below in the root folder of the project
-and it will automatically create the jar.
+we used `sbt-assembly`. To get the fat JAR, run the command below in the root folder of the project
+and it will automatically create the `projectScalable.jar` file in the `data` folder of the project.
 ```
 cd projectScalable
-assembly
+sbt assembly
 ``` 
-
-After getting the JAR file, change its name to `projectScalable.jar` and move iside the folder `projectScalable/data`,
-or, go inside the `config.json` file and change the values of `gcp.job.jarFileName` and `gcp.job.jarFileDir`. 
 
 
 ### Installing the Map Viewer app
 The MapViewer app source is located in the `mapViewer` folder. For installing and running the app, it is required 
-[Node.js][nodejs-download] to be installed on your local workstation.
-Istall:
+[Node.js][nodejs-download] to be installed on your local workstation.  
+For installing the required packages: 
 ```
 cd projectScalable/mapViewer
 npm install
@@ -165,18 +168,21 @@ npm start
 ```
 
 ## Running the project
-Before running the project, be sure that you have followed the previous steps, so that>
-- the jar has been generated and placed in the folder `data` or it is
-linked in the `config.json` file
-- the key for accessing GCP apis is generated and linked in the `config.json` file
-- the `projectId` in the `config.json` is set to respect of the key associated
-For running the project, run the `npm start` in the `mapViewer` folder.
+Before running the project, be sure that you have followed the previous steps:
+- The fat JAR has been generated and placed in the folder `data` or it is
+linked in the `config.json` file.
+- The key for accessing GCP apis is generated and linked in the `config.json` file.
+- The `projectId` in the `config.json` is set as the key associated.
 
-Once the app is running, you will see a message `listening on 3000`.
-Open a browser with javascript enabled and connect to the server `localhost:3000`.
-Once connected, you will see two buttons: `Launch Demo` and `Launch GCP`.
-The first button will load the local files and will show few stations on the map as described in the Demo section / link.
-The `Launch GCP` button will run the operations for running the Scala-Spark on a Google cloud Cluster.
+For running the project, run the command `npm start` in the `mapViewer` folder.
+
+Once the app is running, you will see a message in the console: `listening on 3000`.  
+Open a browser with javascript enabled and connect to the server `localhost:3000`.  
+Once connected, you will see two buttons: `Launch Demo` and `Launch GCP`.  
+`Launch Demo` loads the local files and shows few stations on the map as described in the 
+[Demo section](#demo-description).
+
+`Launch GCP` runs the operations for running the Scala-Spark on a Google Cloud Dataproc Cluster.
 The step done are listed below:
 - Initialization of Clients for connecting to Google CLoud APIs.
 - Creation of the Bucket.
@@ -186,14 +192,11 @@ The step done are listed below:
 - Download of the results computed by the Job.
 - Launch of the client app for viewing the map.
  
-mettere screeshoots?
 ## Extra
 
 ### Demo description
-la demo contiene solo 50 nodi
-npm start
-launch demo
-uauu
+The demo is made for showing an example of the result of computing the PageRank.
+In the demo it is shown only about 50 stations.
 
 ### Using the gcloud console
 
