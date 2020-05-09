@@ -1,8 +1,54 @@
 # SCALABLE AND CLOUD PROGRAMMING PROJECT 
-### A.A. 2019-2020
+***Antonio Lategano, Salvatore Visaggi***
 
-##### Antonio Lategano
-##### Salvatore Visaggi
+**Table of contents:**
+
+* [Project Description](#project-description)
+    * [Dataset](#dataset)
+    * [Project Structure](#project-structure)
+* [Before you begin](#before-you-begin)
+* [Setting up the project](#setting-up-the-project)
+    * [Installing the Map Viewer app](#installing-the-map-viewer-app)
+    * [Explaining config.json structure](#explaining-config.json-structure)
+    * [Creating the jar executable](#creating-the-jar-executable)
+* [Running the project](#running-the-project)
+* [Extra](#extra)
+    * [Demo description](#demo-description)
+    * [Using the gcloud console](#using-the-gcloud-console)
+
+## Project Description
+
+### Dataset
+
+### Project Structure
+
+## Before you begin
+
+1.  [Select or create a Cloud Platform project][projects].
+1.  [Enable billing for your project][billing].
+1.  [Enable the Google Cloud Dataproc API][enable_api_dataproc].
+1.  [Enable the Google Cloud Storage API][enable_api_storage].
+1.  [Set up authentication with a service account][auth] so you can access the
+    API from your local workstation. Save the JSON key and store it carefully on your local workstation for 
+    further use, as explained in [Setting up the project](#setting-up-the-project).
+
+## Setting up the project
+
+### Installing the Map Viewer app
+
+### Explaining config.json structure
+
+### Creating the jar executable
+
+## Running the project
+
+## Extra
+
+### Demo description
+
+### Using the gcloud console
+
+
 
 ## Setup
 
@@ -68,3 +114,17 @@ gcloud dataproc jobs submit spark --cluster pagerank-cluster
 gcloud dataproc clusters delete pagerank-cluster
 gsutil rm -r gs://pagerank-bucket/
 ```
+
+
+
+[client-docs]: https://googleapis.dev/nodejs/dataproc/latest
+[product-docs]: https://cloud.google.com/dataproc
+[shell_img]: https://gstatic.com/cloudssh/images/open-btn.png
+[projects]: https://console.cloud.google.com/project
+[billing]: https://support.google.com/cloud/answer/6293499#enable-billing
+[enable_api_dataproc]: https://console.cloud.google.com/flows/enableapi?apiid=dataproc.googleapis.com
+[auth]: https://cloud.google.com/docs/authentication/getting-started
+
+
+
+[enable_api_storage]: https://console.cloud.google.com/flows/enableapi?apiid=storage-api.googleapis.com
