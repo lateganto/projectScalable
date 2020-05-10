@@ -17,6 +17,9 @@
     * [Using the gcloud command-line tool](#using-the-gcloud-command-line-tool)
 
 ## Project Description
+![](images/map.png)
+
+
 The main purpose of this project is to compute the Weighted PageRank for the bike stations of the
 [CapitalBikeShare][capital_bike] network in Washington DC developing a scala-spark app.  
 The PageRank of the stations is computed considering the [tripdata of the year 2019][capital_bike_data].  
@@ -210,9 +213,10 @@ linked in the `config.json` file.
 
 For running the project, run the command `npm start` in the `mapViewer` folder.
 
-Once the app is running, you will see a message in the command line: `listening on 3000`.  
+Once the app is running, you will see a message in the command line: `listening on port 3000`.  
 Open a browser with javascript enabled and connect to the server `localhost:3000`.  
 Once connected, you will see two buttons: `Launch Demo` and `Launch GCP`.  
+
 `Launch Demo` loads the local files and shows few stations on the map as described in the 
 [Demo section](#demo-description).
 
@@ -234,6 +238,8 @@ The steps done are listed below:
 ## Extra
 
 ### Demo description
+![](images/demo.png)
+
 The demo is made for showing an example of the result of computing the PageRank.
 In the demo it is shown only about 50 stations. The demo is built from a reduced portion of the original dataset,
 considering only the tripdata of the reduced number of stations.
