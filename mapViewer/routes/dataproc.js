@@ -19,6 +19,7 @@ function runRequest(request) {
             done = true;
         })
         .catch(e => {
+            console.log(e);
             error = e.message;
         });
 }
@@ -169,6 +170,7 @@ async function uploadFile(options) {
         // Support for HTTP requests made with `Accept-Encoding: gzip`
         gzip: false,
         destination: `${gsDir}${file}`,
+        resumable: false,
         metadata: {
             // Enable long-lived HTTP caching headers
             // Use only if the contents of the file will never change

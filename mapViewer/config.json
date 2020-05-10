@@ -2,7 +2,7 @@
   "keyFilename": "key.json",
   "gcp": {
     "projectId": "scalable-pagerank",
-    "location": "us-central1",
+    "location": "europe-west3",
     "bucket": {
       "bucketName": "scalable-pagerank-bucket-1",
       "storageClass": "standard"

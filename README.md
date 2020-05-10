@@ -183,8 +183,8 @@ Also, you can decide to use the default values for the other arguments, or you c
 the default settings.
 
 #### Input
-The field `input` specifies the folder and the names of the files to be processed. 
-By default, the `data/input` folder contains all the input files named by `[year][mont]-capitalbikeshare-tripdata.csv`.
+The field `input` specifies the path and the names of the files to be processed. 
+By default, the `data/input` folder contains all the input files named by `[year][month]-capitalbikeshare-tripdata.csv`.
 
 #### Output
 
@@ -264,7 +264,7 @@ gcloud projects create pagerank-project`
 This command allows you to create a new bucket used to store all the data required to 
 the project and is used to store all the results. 
 ```
-gsutil mb -p pagerank-project -l US-CENTRAL1 -c STANDARD gs://pagerank-bucket/
+gsutil mb -p pagerank-project -l EUROPE-WEST3 -c STANDARD gs://pagerank-bucket/
 ```
 #### Create a cluster 
 This below is an example with three nodes: a master and two workers. You are free to 
@@ -272,9 +272,9 @@ apply changes. Bear in mind that the actual image-version (1.5-debian10) has the
 correct version of Scala and Spark. 
 ```
 gcloud dataproc clusters create pagerank-cluster
---region us-central1
+--region europe-west3
 --subnet default
---zone us-central1-a
+--zone europe-west3-a
 --master-machine-type n1-standard-1
 --master-boot-disk-size 30
 --num-workers 2
