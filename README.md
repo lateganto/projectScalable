@@ -270,7 +270,7 @@ gsutil mb -p scalable-pagerank -l europe-west3 -c STANDARD gs://scalable-pageran
 This below is an example with four nodes: a master and three workers. You are free to 
 apply changes. Bear in mind that the actual image-version (1.5-debian10) has the
 correct version of Scala and Spark. The cluster will be automatically deleted after 15 minutes 
-to prevent waste of money(`max-age`). 
+to prevent waste of money (`max-age`). 
 ```
 gcloud dataproc clusters create scalable-pagerank-cluster
 --region europe-west3
@@ -302,9 +302,9 @@ For the JAR args see [JarArgs](#GCP).
 This command submits a spark job on the Cluster specified.
 ```
 gcloud dataproc jobs submit spark --cluster scalable-pagerank-cluster
-    --jar gs://scalable-pagerank-bucket/projectScalable.jar 
-    --inputDir=gs://scalable-pagerank-bucket/input/
-    --outputDir=gs://scalable-pagerank-bucket/output/
+--jar gs://scalable-pagerank-bucket/projectScalable.jar --
+--inputDir=gs://scalable-pagerank-bucket/input/
+--outputDir=gs://scalable-pagerank-bucket/output/
 ```
 
 #### Delete the cluster and the bucket
