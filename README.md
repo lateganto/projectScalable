@@ -163,9 +163,9 @@ on your local workstation. **Set this value before to continue**.
 #### GCP
 The `gcp` values are used for setting bucket, cluster and job properties on GCP.  
 Set the value `projectId` as that your key is associated. Then, set the values
- `location`, `bucketName` and `clusterName` as you like, or leave it as they are.   
+ `location`, `bucketName` and `clusterName` as you like, or leave them as they are.   
  You could change the configuration of the cluster. As default, the cluster is composed of a master and
-  3 workers with 2 standard cpus each one.  
+  3 workers with 2 standard CPUs each one.  
 The `Job` field contains the properties of the JAR to be uploaded and submitted to Dataproc. 
 `jarFileDir` and `jarFileName` specifies the location of the JAR on your local workstation. 
 By default, the JAR is placed inside the folder `data`.  
@@ -175,7 +175,7 @@ The arguments to be passed as input to the JAR are:
 - `--inputDir` - the folder where all the files to process are located on the Bucket.
 - `--outputDir` - the folder where all the output files will be saved on the Bucket.
 - `--numIterations` - by default is set to `10`, it is the number of iteration for PageRank algorithm.
-- `--dampingFactor` - by default is set to `0.85`, it is the damping factor for PagRank algorithm.
+- `--dampingFactor` - by default is set to `0.85`, it is the damping factor for PageRank algorithm.
 - `--local` - by default is set to `false`. When running the JAR on a local machine, it should be set to `true`.
 The `--inputDir` and `--outputDir` parameters are set dynamically according to the Bucket properties, so it is not
 required to change these fields.
@@ -257,62 +257,63 @@ After installing and initializating the gcloud sdk, you have to create a Google 
 billing and Dataproc API][gcloud-dataproc-billing].
 
 ```
-gcloud projects create pagerank-project`
+gcloud projects create scalable-pagerank
 ```
 
 #### Create a new bucket
 This command allows you to create a new bucket used to store all the data required to 
-the project and is used to store all the results. 
+the project. It is also used to store the results of the computation (nodes ranks and links). 
 ```
-gsutil mb -p pagerank-project -l EUROPE-WEST3 -c STANDARD gs://pagerank-bucket/
+gsutil mb -p scalable-pagerank -l europe-west3 -c STANDARD gs://scalable-pagerank-bucket/
 ```
 #### Create a cluster 
-This below is an example with three nodes: a master and two workers. You are free to 
+This below is an example with four nodes: a master and three workers. You are free to 
 apply changes. Bear in mind that the actual image-version (1.5-debian10) has the
-correct version of Scala and Spark. 
+correct version of Scala and Spark. The cluster will be automatically deleted after 15 minutes 
+to prevent waste of money(`max-age`). 
 ```
-gcloud dataproc clusters create pagerank-cluster
+gcloud dataproc clusters create scalable-pagerank-cluster
 --region europe-west3
 --subnet default
 --zone europe-west3-a
---master-machine-type n1-standard-1
+--master-machine-type n1-standard-2
 --master-boot-disk-size 30
---num-workers 2
---worker-machine-type n1-standard-1
+--num-workers 3
+--worker-machine-type n1-standard-2
 --worker-boot-disk-size 30
 --image-version 1.5-debian10
---project pagerank-project`
+--max-age=t15m
+--project scalable-pagerank
 ```
 
 
 #### Copy jar and input files to Cloud Storage
-This command performs an upload to the created Bucket.
-The input files must be stored all inside the same folder (e.g. `gs://pagerank-bucket/input/`). 
+To start the computation you need to upload the executable and the input files to the Bucket.
+Input files must be stored all inside the same folder (e.g. `gs://scalable-pagerank-bucket/input/`). 
 This because the [JAR app](#creating-the-jar-executable) takes as input argument 
 the folder where all the files to be processed are stored, and executes the computation on all the files.
 ```
-gsutil cp [your_local_path]/projectScalable.jar gs://pagerank-bucket/
-gsutil cp [your_local_path]/input.csv gs://pagerank-bucket/input/
+gsutil cp [your_local_path]/projectScalable.jar gs://scalable-pagerank-bucket/
+gsutil cp [your_local_path]/[year][month]-capitalbikeshare-tripdata.csv gs://scalable-pagerank-bucket/input/
 ```
 
 #### Submit jar to a Cloud Dataproc Spark job
 For the JAR args see [JarArgs](#GCP).
 This command submits a spark job on the Cluster specified.
 ```
-gcloud dataproc jobs submit spark --cluster pagerank-cluster
-    --jar gs://pagerank-bucket/projectScalable.jar 
-    --inputDir=gs://pagerank-bucket/input/
-    --outputDir=gs://pagerank-bucket/output/
+gcloud dataproc jobs submit spark --cluster scalable-pagerank-cluster
+    --jar gs://scalable-pagerank-bucket/projectScalable.jar 
+    --inputDir=gs://scalable-pagerank-bucket/input/
+    --outputDir=gs://scalable-pagerank-bucket/output/
 ```
 
 #### Delete the cluster and the bucket
-After all is done, delete all the allocated resources.
+The cluster is automatically deleted after 15 minutes to prevent waste of money. If you want to delete it before (and 
+delete also the bucket) use the following comamnds. 
 ```
-gcloud dataproc clusters delete pagerank-cluster
-gsutil rm -r gs://pagerank-bucket/
+gcloud dataproc clusters delete scalable-pagerank-cluster
+gsutil rm -r gs://scalable-pagerank-bucket/
 ```
-
-
 
 
 [client-dataproc-docs]: https://googleapis.dev/nodejs/dataproc/latest
