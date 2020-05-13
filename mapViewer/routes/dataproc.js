@@ -106,9 +106,7 @@ let clusterClient = null;
 let jobClient = null;
 
 async function initClients() {
-    const projectId = config.gcp.projectId;
-    const keyFilename = config.keyFilename;
-    const location = config.gcp.location;
+    const {keyFilename, gcp: {projectId, location}} = config;
 
     storage = new Storage({projectId, keyFilename});
     console.log(`Storage for project ${projectId} created.`);
@@ -129,9 +127,7 @@ async function initClients() {
 }
 
 async function createBucket() {
-    const bucketName = config.gcp.bucket.bucketName;
-    const storageClass = config.gcp.bucket.storageClass;
-    const location = config.gcp.location;
+    const {gcp: {location, bucket: {bucketName, storageClass}}} = config;
 
     const [bucket] = await storage.createBucket(bucketName, {
         location: location.toUpperCase(),
@@ -142,13 +138,12 @@ async function createBucket() {
 }
 
 async function createCluster() {
-    const projectId = config.gcp.projectId;
-    const location = config.gcp.location;
+    const {gcp: {projectId, location, cluster}} = config;
 
     const request = {
         projectId: projectId,
         region: location,
-        cluster: config.gcp.cluster
+        cluster: cluster
     };
 
     const [operation] = await clusterClient.createCluster(request);
@@ -160,10 +155,7 @@ async function createCluster() {
 }
 
 async function uploadFile(options) {
-    const fileDir = options.fileDir;
-    const file = options.file;
-    const bucketName = options.bucketName;
-    const gsDir = options.gsDir;
+    const {fileDir, file, bucketName, gsDir} = options;
 
     const filename = `${fileDir}/${file}`;
     await storage.bucket(bucketName).upload(filename, {
@@ -183,11 +175,10 @@ async function uploadFile(options) {
 }
 
 async function uploadFiles() {
-    const inputFileNames = config.input.inputLinksFiles;
-    const inputPath = config.input.inputPath;
-    const bucketName = config.gcp.bucket.bucketName;
-    const jarFileDir = config.gcp.job.jarFileDir;
-    const jarFileName = config.gcp.job.jarFileName;
+    const {
+        input: {inputLinksFiles: inputFileNames, inputPath},
+        gcp: {bucket: {bucketName}, job: {jarFileDir, jarFileName}}
+    } = config;
 
     var uploads = []
     uploads.push(uploadFile({fileDir: jarFileDir, file: jarFileName, gsDir: '', bucketName: bucketName}));
@@ -202,12 +193,13 @@ async function uploadFiles() {
 }
 
 async function submitJob() {
-    const projectId = config.gcp.projectId;
-    const location = config.gcp.location;
-    const bucketName = config.gcp.bucket.bucketName;
-    const jarFileName = config.gcp.job.jarFileName;
-    const clusterName = config.gcp.cluster.clusterName;
-    const jarArgs = config.gcp.job.jarArgs;
+    const {
+        gcp: {
+            projectId, location,
+            bucket: {bucketName}, job: {jarFileName, jarArgs}, cluster: {clusterName}
+        }
+    } = config;
+
     const mainJarFileUri = `gs://${bucketName}/${jarFileName}`;
 
     const job = {
@@ -285,11 +277,7 @@ async function submitJob() {
 }
 
 async function getJobResultFiles(options) {
-    const bucketName = options.bucketName;
-    const typeResult = options.typeResult;
-    const inputFileName = options.inputFileName;
-    const dataDir = options.dataDir;
-    const outputDir = options.outputDir;
+    const {bucketName, typeResult, inputFileName, dataDir, outputDir} = options;
 
     const [files] = await storage.bucket(bucketName).getFiles({
         autoPaginate: false,
@@ -311,11 +299,10 @@ async function getJobResultFiles(options) {
 }
 
 async function downloadResults() {
-    const bucketName = config.gcp.bucket.bucketName;
-    const typeResults = config.output.typeResults;
-    const inputFileNames = config.input.inputLinksFiles;
-    const publicDir = config.output.publicDir;
-    const dataDir = config.output.dataDir;
+    const {
+        gcp: {bucket: {bucketName}}, input: {inputLinksFiles: inputFileNames},
+        output: {typeResults, publicDir, dataDir}
+    } = config;
 
     const outputDir = `${publicDir}${dataDir}`
 
@@ -369,10 +356,7 @@ async function downloadResults() {
 }
 
 async function deleteAllResources() {
-    const projectId = config.gcp.projectId;
-    const location = config.gcp.location;
-    const clusterName = config.gcp.cluster.clusterName;
-    const bucketName = config.gcp.bucket.bucketName;
+    const {gcp: {projectId, location, cluster: {clusterName}, bucket: {bucketName}}} = config;
 
     // By default, if a file cannot be deleted, this method will stop deleting
     // files from your bucket. You can override this setting with `force: true
