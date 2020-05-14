@@ -301,7 +301,8 @@ gsutil cp [your_local_path]/[year][month]-capitalbikeshare-tripdata.csv gs://sca
 For the JAR args see [JarArgs](#GCP).
 This command submits a spark job on the Cluster specified.
 ```
-gcloud dataproc jobs submit spark --cluster scalable-pagerank-cluster
+gcloud dataproc jobs submit spark 
+--cluster scalable-pagerank-cluster
 --jar gs://scalable-pagerank-bucket/projectScalable.jar --
 --inputDir=gs://scalable-pagerank-bucket/input/
 --outputDir=gs://scalable-pagerank-bucket/output/

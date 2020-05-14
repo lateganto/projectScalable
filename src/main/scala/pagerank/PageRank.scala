@@ -20,7 +20,7 @@ object PageRank {
       while (iteration < n_iter) {
 
          //sum of the PR_values of dangling nodes
-         val danglesum = damping_factor * updatedVertices
+         val danglesum = updatedVertices
             .map(v =>
                if (v._2.isDangling) v._2.value
                else 0.0
@@ -65,7 +65,7 @@ object PageRank {
          .leftOuterJoin(incomingWeightedSum)
          .map {
             case (id, (vertex_data, rankUpdate)) =>
-               val newValue = danglesum / numVertices +
+               val newValue = damping_factor * danglesum / numVertices +
                   damping_factor * rankUpdate.getOrElse(0.0) +
                   (1 - damping_factor) / numVertices
 

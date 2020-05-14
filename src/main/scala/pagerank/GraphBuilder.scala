@@ -57,7 +57,6 @@ object GraphBuilder {
          .map { case SimpleEdge(srcId, dstId, weight) =>
             (srcId, (dstId, weight))
          }
-         //(_.toOutSimpleEdgePair)
          .join(sums)
          .map { case (srcId, (outEdge, weightSum)) =>
             Edge(srcId, outEdge._1, outEdge._2, outEdge._2 / weightSum)
