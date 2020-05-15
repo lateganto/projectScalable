@@ -10,95 +10,53 @@ const dataproc = require('@google-cloud/dataproc');
 let done = false;
 let error = null;
 
-function runRequest(request) {
-    done = false;
-    error = null;
+function runRequest(qRun, request) {
+    var run = JSON.parse(qRun);
 
-    request()
-        .then(() => {
-            done = true;
-        })
-        .catch(e => {
-            console.log(e);
-            error = e.message;
-        });
+    if (run === true) {
+        run = false;
+        done = false;
+        error = null;
+
+        request()
+            .then(() => {
+                done = true;
+            })
+            .catch(e => {
+                console.log(e);
+                error = e.message;
+            });
+    }
+
+    return {done: done, run: run, error: error};
 }
 
 router.get('/', function (req, res, next) {
-    var run = JSON.parse(req.query.run);
-
-    if (run === true) {
-        run = false;
-        runRequest(initClients);
-    }
-
-    res.status(200).json({done: done, run: run, error: error});
+    res.status(200).json(runRequest(req.query.run, initClients));
 });
 
 router.get('/createBucket', function (req, res, next) {
-    var run = JSON.parse(req.query.run);
-
-    if (run === true) {
-        run = false;
-        runRequest(createBucket);
-    }
-
-    res.status(200).json({done: done, run: run, error: error});
+    res.status(200).json(runRequest(req.query.run, createBucket));
 });
 
 router.get('/createCluster', function (req, res, next) {
-    var run = JSON.parse(req.query.run);
-
-    if (run === true) {
-        run = false;
-        runRequest(createCluster);
-    }
-
-    res.status(200).json({done: done, run: run, error: error});
+    res.status(200).json(runRequest(req.query.run, createCluster));
 });
 
 router.get('/uploadFiles', function (req, res, next) {
-    var run = JSON.parse(req.query.run);
-
-    if (run === true) {
-        run = false;
-        runRequest(uploadFiles);
-    }
-
-    res.status(200).json({done: done, run: run, error: error});
+    res.status(200).json(runRequest(req.query.run, uploadFiles));
 });
 
 router.get('/submitJob', function (req, res, next) {
-    var run = JSON.parse(req.query.run);
-
-    if (run === true) {
-        run = false;
-        runRequest(submitJob);
-    }
-
-    res.status(200).json({done: done, run: run, error: error});
+    res.status(200).json(runRequest(req.query.run, submitJob));
 });
 
 router.get('/downloadResults', function (req, res, next) {
-    var run = JSON.parse(req.query.run);
-
-    if (run === true) {
-        run = false;
-        runRequest(downloadResults);
-    }
-
-    res.status(200).json({done: done, run: run, error: error});
+    res.status(200).json(runRequest(req.query.run, downloadResults));
 });
 
 router.get('/deleteAll', function (req, res, next) {
-    var run = JSON.parse(req.query.run);
-
-    if (run === true) {
-        run = false;
-        runRequest(deleteAllResources);
-    }
-
-    res.status(200).json({done: done, run: run, error: error});
+    res.status(200).json(runRequest(req.query.run, deleteAllResources));
 });
 
 let storage = null;
@@ -193,13 +151,8 @@ async function uploadFiles() {
 }
 
 async function submitJob() {
-    const {
-        gcp: {
-            projectId, location,
-            bucket: {bucketName}, job: {jarFileName, jarArgs}, cluster: {clusterName}
-        }
-    } = config;
-
+    const { gcp: { projectId, location,
+            bucket: { bucketName }, job: { jarFileName, jarArgs }, cluster: { clusterName } } } = config;
     const mainJarFileUri = `gs://${bucketName}/${jarFileName}`;
 
     const job = {
