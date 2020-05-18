@@ -124,35 +124,35 @@ The file `config.json` is located in the folder `projectScalable/mapViewer`. Thi
 values for running the app. The structure of the configuration is shown below.
 ```
 {
-    keyFileName: string
-    gcp: {
-        projectId: string,
-        location: string,
-        bucket: {
-            bucketName: string,
-            storageClass: string
+    "keyFileName": "",
+    "gcp": {
+        "projectId": "",
+        "location": "",
+        "bucket": {
+            "bucketName": "",
+            "storageClass": ""
         },
-        cluster: {
-            clusterName: string,
-            config: {...}
+        "cluster": {
+            "clusterName": "String",
+            "config": {...}
         },
-        job: {
-            jarFileDir: string,
-            jarFileName: string,
-            jarArgs: {
-                inputDir: string,
-                outputDir: string,
-                numIterations": string,
-                dampingFactor": string,
-                local: string
+        "job": {
+            "jarFileDir": "",
+            "jarFileName": "",
+            "jarArgs": {
+                "inputDir": "",
+                "outputDir": "",
+                "numIterations": "",
+                "dampingFactor": "",
+                "local": ""
             }
         }
     },
-    input: {
-        inputPath: string,
-        inputLinksFiles: [string] 
+    "input": {
+        "inputPath": "",
+        "inputLinksFiles": [""] 
     },
-    output: {...}
+    "output": {...}
 }
 ```
 
