@@ -215,12 +215,12 @@ For running the project, run the command `npm start` in the `mapViewer` folder.
 
 Once the app is running, you will see a message in the command line: `listening on port 3000`.  
 Open a browser with javascript enabled and connect to the server `localhost:3000`.  
-Once connected, you will see two buttons: `Launch Demo` and `Launch GCP`.  
+Once connected, you will see two buttons: `Launch Demo` and `Launch Job on GCP`.  
 
 `Launch Demo` loads the local files and shows few stations on the map as described in the 
 [Demo section](#demo-description).
 
-`Launch GCP` runs the operations for running the Scala-Spark on a Google Cloud Dataproc Cluster.
+`Launch Job on GCP` runs the operations for running the Scala-Spark on a Google Cloud Dataproc Cluster.
 The steps done are listed below:
 - Initialization of Clients for connecting to Google CLoud APIs.
 - Creation of the Bucket.
