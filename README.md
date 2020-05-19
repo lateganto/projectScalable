@@ -139,13 +139,12 @@ values for running the app. The structure of the configuration is shown below.
         "job": {
             "jarFileDir": "",
             "jarFileName": "",
-            "jarArgs": {
-                "inputDir": "",
-                "outputDir": "",
-                "numIterations": "",
-                "dampingFactor": "",
-                "local": ""
-            }
+            "jarArgs": [
+                "--inputDir",
+                "--outputDir",
+                "--numIterations=10",
+                "--dampingFactor=0.85"
+            ]
         }
     },
     "input": {
@@ -172,11 +171,13 @@ By default, the JAR is placed inside the folder `data`.
 
 The `jarArgs` specifies the arguments to be passed to the JAR when launching it.
 The arguments to be passed as input to the JAR are:
-- `--inputDir` - the folder where all the files to process are located on the Bucket.
-- `--outputDir` - the folder where all the output files will be saved on the Bucket.
+- `--inputDir` - the argument to use for setting where all the files to process are located on the Bucket.
+- `--outputDir` - the argument to use for setting where all the output files will be saved on the Bucket.
 - `--numIterations` - by default is set to `10`, it is the number of iteration for PageRank algorithm.
 - `--dampingFactor` - by default is set to `0.85`, it is the damping factor for PageRank algorithm.
-- `--local` - by default is set to `false`. When running the JAR on a local machine, it should be set to `true`.
+- `--local` - by default it is not specified inside the `jarArgs` array. When running the JAR on a local machine,
+ it should be added inside the array.
+ 
 The `--inputDir` and `--outputDir` parameters are set dynamically according to the Bucket properties, so it is not
 required to change these fields.
 Also, you can decide to use the default values for the other arguments, or you can change the values according to 

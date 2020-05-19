@@ -43,13 +43,12 @@
     "job": {
       "jarFileDir": "../data",
       "jarFileName": "projectScalable.jar",
-      "jarArgs": {
-        "inputDir": "--inputDir",
-        "outputDir": "--outputDir",
-        "numIterations": "--numIterations=10",
-        "dampingFactor": "--dampingFactor=0.85",
-        "local": "--local=false"
-      }
+      "jarArgs": [
+        "--inputDir",
+        "--outputDir",
+        "--numIterations=10",
+        "--dampingFactor=0.85"
+      ]
     }
   },
   "input" : {
