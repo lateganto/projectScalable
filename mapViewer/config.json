@@ -4,11 +4,11 @@
     "projectId": "scalable-pagerank",
     "location": "europe-west3",
     "bucket": {
-      "bucketName": "scalable-pagerank-bucket-1",
+      "bucketName": "scalable-pagerank-bucket",
       "storageClass": "standard"
     },
     "cluster": {
-      "clusterName": "scalable-pagerank-cluster-4",
+      "clusterName": "scalable-pagerank-cluster",
       "config": {
         "masterConfig": {
           "numInstances": 1,
