@@ -152,7 +152,7 @@ async function submitJob() {
     const { gcp: { projectId, location,
             bucket: { bucketName }, job: { jarFileName, jarArgs }, cluster: { clusterName } } } = config;
     const mainJarFileUri = `gs://${bucketName}/${jarFileName}`;
-    const args = Object.assign({}, jarArgs);
+    const args = JSON.parse(JSON.stringify(jarArgs));
     args[0] = `${jarArgs[0]}=gs://${bucketName}/input/`;
     args[1] = `${jarArgs[1]}=gs://${bucketName}/output/`;
 
